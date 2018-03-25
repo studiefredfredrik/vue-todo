@@ -9,9 +9,13 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Raven.Client.Documents;
+using vue_todo_api.Data;
 
 namespace vue_todo_api
 {
+    
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -38,10 +42,20 @@ namespace vue_todo_api
             option.AddRedirect("^$", "index.html");
             app.UseRewriter(option);
 
-            app.UseStaticFiles(new StaticFileOptions
+            app.UseStaticFiles();
+
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../vue-todo-frontend/dist")), RequestPath = ""
+            //});
+
+            var documentStore = new DocumentStore()
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../vue-todo-frontend/dist")), RequestPath = ""
-            });
+                Urls = new[] { "http://localhost:8080" },
+                Database = "vue-todo-notes"
+            }.Initialize();
+
+            var notesRepository = new NotesRepository(() => documentStore.OpenAsyncSession());
         }
     }
 }
