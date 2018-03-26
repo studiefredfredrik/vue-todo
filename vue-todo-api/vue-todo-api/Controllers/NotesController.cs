@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using VueTodoApi.Data;
 
 namespace vue_todo_api.Controllers
 {
@@ -11,9 +12,11 @@ namespace vue_todo_api.Controllers
     {
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get(string userId)
+        public async Task<string> GetAsync(string userId)
         {
-            return new string[] { "value1", "value2" };
+            //return new string[] { "value1", "value2" };
+            await Global.notesRepository.CreateNote(1234, "yoo");
+            return "oki";
         }
 
         // GET api/values/5
