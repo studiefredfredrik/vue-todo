@@ -6,9 +6,9 @@ using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 
-namespace vue_todo_api.Data
+namespace VueTodoApi.Data
 {
-    internal class NotesDocument
+    public class NotesDocument
     {
         public int UserId { get; set; }
         public string Text { get; set; }
@@ -23,7 +23,7 @@ namespace vue_todo_api.Data
     //    Task UpdateNotifiedOn(string registrationNumber, string countryCode, DateTimeOffset notifiedOn);
     //}
 
-    internal class NotesRepository //: INotesRepository
+    public class NotesRepository //: INotesRepository
     {
         private readonly Func<IAsyncDocumentSession> _getSession;
 
@@ -61,7 +61,7 @@ namespace vue_todo_api.Data
                 {
                     Text = text,
                     UserId = userId,
-                    NoteId = new Guid()
+                    NoteId = Guid.NewGuid()
                 };
                 await session.StoreAsync(doc);
                 await session.SaveChangesAsync();

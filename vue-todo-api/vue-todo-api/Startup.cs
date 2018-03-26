@@ -10,14 +10,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Raven.Client.Documents;
-using vue_todo_api.Data;
+using VueTodoApi.Data;
 
 namespace vue_todo_api
 {
+    public static class Global
+    {
+        public static NotesRepository notesRepository;
+    }
     
 
     public class Startup
     {
+        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,6 +34,7 @@ namespace vue_todo_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,11 +45,12 @@ namespace vue_todo_api
                 app.UseDeveloperExceptionPage();
             }
 
-            var option = new RewriteOptions();
-            option.AddRedirect("^$", "index.html");
-            app.UseRewriter(option);
+            //var option = new RewriteOptions();
+            //option.AddRedirect("^$", "index.html");
+            //app.UseRewriter(option);
 
             app.UseStaticFiles();
+            app.UseMvc();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
@@ -55,7 +63,7 @@ namespace vue_todo_api
                 Database = "vue-todo-notes"
             }.Initialize();
 
-            var notesRepository = new NotesRepository(() => documentStore.OpenAsyncSession());
+            Global.notesRepository = new NotesRepository(() => documentStore.OpenAsyncSession());
         }
     }
 }
