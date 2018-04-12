@@ -1,19 +1,12 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace VueTodoApi.Controllers
 {
     public class LoginController
     {
-
-
-
-
         /// <summary>
         /// Use the below code to generate symmetric Secret Key
         ///     var hmac = new HMACSHA256();
@@ -29,10 +22,7 @@ namespace VueTodoApi.Controllers
             var now = DateTime.UtcNow;
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                        {
-                        new Claim(ClaimTypes.Name, username)
-                    }),
+                Subject = new ClaimsIdentity(new[]{ new Claim(ClaimTypes.Name, username) }),
 
                 Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
 

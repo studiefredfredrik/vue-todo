@@ -15,23 +15,11 @@ namespace VueTodoApi.Data
         public Guid NoteId { get; set; }
     }
 
-    //internal interface INotesRepository
-    //{
-    //    Task DisableNotes(string registrationNumber, string countryCode, DateTimeOffset disabledOn);
-    //    Task EnableNotes(string registrationNumber, string countryCode, DateTimeOffset nextNotesDate, DateTimeOffset enabledOn);
-    //    Task<List<NotesDocument>> GetNotes(DateTimeOffset begin, DateTimeOffset end, DateTimeOffset notSentSince);
-    //    Task UpdateNotifiedOn(string registrationNumber, string countryCode, DateTimeOffset notifiedOn);
-    //}
-
     public class NotesRepository //: INotesRepository
     {
-        private readonly Func<IAsyncDocumentSession> _getSession;
-
-        public NotesRepository(Func<IAsyncDocumentSession> getSession) => _getSession = getSession;
-
         public async Task<List<NotesDocument>> GetNotes(int userId)
         {
-            using (var session = _getSession())
+            using (var session = DocumentStoreHolder.Store.OpenSession())
             {
                 var result = await session.Query<NotesDocument>()
                     .Where(document => document.UserId == userId)
@@ -55,7 +43,7 @@ namespace VueTodoApi.Data
 
         public async Task CreateNote(int userId, string text)
         {
-            using (var session = _getSession())
+            using (var session = DocumentStoreHolder.Store.OpenAsyncSession())
             {
                 var doc = new NotesDocument
                 {
