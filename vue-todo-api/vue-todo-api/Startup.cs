@@ -63,7 +63,6 @@ namespace vue_todo_api
                 Database = "vue-todo-notes"
             }.Initialize();
 
-            Global.notesRepository = new NotesRepository(() => documentStore.OpenAsyncSession());
         }
     }
 }

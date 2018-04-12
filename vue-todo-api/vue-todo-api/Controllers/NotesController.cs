@@ -3,45 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using VueTodoApi.Data;
+using Raven.Client.Documents;
+using VueTodoApi;
+
 
 namespace vue_todo_api.Controllers
 {
     [Route("api/[controller]")]
     public class NotesController : Controller
     {
-        // GET api/values
         [HttpGet]
-        public async Task<string> GetAsync(string userId)
+        public async Task<List<NotesDocument>> GetAsync()
         {
-            //return new string[] { "value1", "value2" };
-            await Global.notesRepository.CreateNote(1234, "yoo");
-            return "oki";
+            int userId = 100;
+            using (var session = DocumentStoreHolder.Store.OpenAsyncSession())
+            {
+                var result = await session.Query<NotesDocument>()
+                    .Where(document => document.UserId == userId)
+                    .ToListAsync();
+
+                return result;
+            }
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task PostAsync([FromBody]string text)
         {
+            int userId = 100;
+            using (var session = DocumentStoreHolder.Store.OpenAsyncSession())
+            {
+                var doc = new NotesDocument
+                {
+                    Text = text,
+                    UserId = userId,
+                    NoteId = Guid.NewGuid()
+                };
+                await session.StoreAsync(doc);
+                await session.SaveChangesAsync();
+            }
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        public class NotesDocument
         {
+            public int UserId { get; set; }
+            public string Text { get; set; }
+            public Guid NoteId { get; set; }
         }
     }
 }
