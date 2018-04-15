@@ -8,10 +8,12 @@ namespace VueTodoApi
         private static readonly Lazy<IDocumentStore> LazyStore =
             new Lazy<IDocumentStore>(() =>
             {
+
+
                 var store = new DocumentStore
                 {
                     Urls = new[] { "http://localhost:8080" },
-                    Database = "Notes"
+                    Database = "vue-todo-notes"
                 };
 
                 return store.Initialize();
