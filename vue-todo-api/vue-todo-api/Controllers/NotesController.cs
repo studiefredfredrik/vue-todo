@@ -12,11 +12,17 @@ namespace vue_todo_api.Controllers
     [Route("api/[controller]")]
     public class NotesController : Controller
     {
+        IDocumentStore _dc;
+        public NotesController(IDocumentStore dc)
+        {
+            _dc = dc;
+        }
+
         [HttpGet]
         public async Task<List<NotesDocument>> GetAsync()
         {
             int userId = 100;
-            using (var session = DocumentStoreHolder.Store.OpenAsyncSession())
+            using (var session = _dc.OpenAsyncSession())
             {
                 var result = await session.Query<NotesDocument>()
                     .Where(document => document.UserId == userId)
@@ -30,7 +36,7 @@ namespace vue_todo_api.Controllers
         public async Task PostAsync([FromBody]string text)
         {
             int userId = 100;
-            using (var session = DocumentStoreHolder.Store.OpenAsyncSession())
+            using (var session = _dc.OpenAsyncSession())
             {
                 var doc = new NotesDocument
                 {
@@ -42,7 +48,6 @@ namespace vue_todo_api.Controllers
                 await session.SaveChangesAsync();
             }
         }
-
 
         public class NotesDocument
         {

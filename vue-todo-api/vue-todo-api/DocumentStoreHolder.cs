@@ -8,8 +8,6 @@ namespace VueTodoApi
         private static readonly Lazy<IDocumentStore> LazyStore =
             new Lazy<IDocumentStore>(() =>
             {
-
-
                 var store = new DocumentStore
                 {
                     Urls = new[] { "http://localhost:8080" },
