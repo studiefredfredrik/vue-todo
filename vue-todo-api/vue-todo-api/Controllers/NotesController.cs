@@ -1,59 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
-using VueTodoApi;
+using VueTodoApi.Configuration;
+using VueTodoApi.Models;
 
-
-namespace vue_todo_api.Controllers
+namespace VueTodoApi.Controllers
 {
     [Route("api/[controller]")]
     public class NotesController : Controller
     {
-        IDocumentStore _dc;
-        public NotesController(IDocumentStore dc)
+        readonly IDocumentStore _store;
+        readonly NotesSettings _highScoreSettings;
+
+        public NotesController(IDocumentStore store, NotesSettings highScoreSettings)
         {
-            _dc = dc;
+            _store = store;
+            _highScoreSettings = highScoreSettings;
         }
 
         [HttpGet]
-        public async Task<List<NotesDocument>> GetAsync()
+        public List<NotesDocument> Get()
         {
-            int userId = 100;
-            using (var session = _dc.OpenAsyncSession())
+            using (var session = _store.OpenSession())
             {
-                var result = await session.Query<NotesDocument>()
-                    .Where(document => document.UserId == userId)
-                    .ToListAsync();
-
-                return result;
+                return session.Query<NotesDocument>()
+                    .Take(100)
+                    .OrderByDescending(doc => doc.TimeOfEntry)
+                    .ToList();
             }
         }
 
         [HttpPost]
-        public async Task PostAsync([FromBody]string text)
+        public IActionResult Post([FromBody]NotesDocument note, string password)
         {
-            int userId = 100;
-            using (var session = _dc.OpenAsyncSession())
+            if (password != _highScoreSettings.SuperSecretApplicationKey) return Forbid();
+            if (!string.IsNullOrEmpty(note.Id)) return BadRequest("Note Id is already populated");
+
+            note.TimeOfEntry = DateTime.Now;
+            using (var session = _store.OpenSession())
             {
-                var doc = new NotesDocument
-                {
-                    Text = text,
-                    UserId = userId,
-                    NoteId = Guid.NewGuid()
-                };
-                await session.StoreAsync(doc);
-                await session.SaveChangesAsync();
+                session.Store(note);
+                session.SaveChanges();
             }
+            return Ok();
         }
 
-        public class NotesDocument
+        [HttpPut]
+        public IActionResult Put([FromBody]NotesDocument note, string password)
         {
-            public int UserId { get; set; }
-            public string Text { get; set; }
-            public Guid NoteId { get; set; }
+            if (password != _highScoreSettings.SuperSecretApplicationKey) return Forbid();
+            if (string.IsNullOrEmpty(note.Id)) return BadRequest("Note does not have an Id");
+
+            note.TimeOfEntry = DateTime.Now;
+            using (var session = _store.OpenSession())
+            {
+                session.Store(note);
+                session.SaveChanges();
+            }
+            return Ok();
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(string id, string password)
+        {
+            if (password != _highScoreSettings.SuperSecretApplicationKey) return Forbid();
+
+            using (var session = _store.OpenSession())
+            {
+                session.Delete(id);
+                session.SaveChanges();
+            }
+            return Ok();
         }
     }
 }
