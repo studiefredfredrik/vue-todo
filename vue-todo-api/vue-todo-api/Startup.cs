@@ -4,11 +4,10 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
-using Raven.Client.Documents;
 using System.IO;
+using VueTodoApi.Configuration;
 
-namespace vue_todo_api
+namespace VueTodoApi
 {
     public class Startup
     {
@@ -21,15 +20,20 @@ namespace vue_todo_api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var serilogSettings = Configuration.GetSection("SerilogSettings").Get<SerilogSettings>();
+            SerilogConfiguration.Configure(serilogSettings);
+
+            var ravenConfig = Configuration.GetSection("RavenDbSettings").Get<RavenDbSettings>();
+            services.AddSingleton(RavenDbConfiguration.Configure(ravenConfig));
+
+            var notesSettings = Configuration.GetSection("NotesSettings").Get<NotesSettings>();
+            services.AddSingleton(notesSettings);
+
             services.AddMvc();
-            var store = InitRavenDb();
-            services.AddSingleton(store);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -47,17 +51,5 @@ namespace vue_todo_api
 
             app.UseMvc();
         }
-
-        private static IDocumentStore InitRavenDb()
-        {
-            var store = new DocumentStore
-            {
-                Urls = new[] { "http://localhost:8080" },
-                Database = "vue-todo-notes"
-            };
-            store.Initialize();
-            return store;
-        }
-
     }
 }

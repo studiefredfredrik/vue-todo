@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace vue_todo_api
+namespace VueTodoApi
 {
     public class Program
     {
@@ -13,6 +13,7 @@ namespace vue_todo_api
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseUrls("http://*:9095")
                 .Build();
     }
 }
