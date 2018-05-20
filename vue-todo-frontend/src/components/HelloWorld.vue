@@ -1,3 +1,5 @@
+
+
 <template>
   <div class="w3-light-grey">
     <!-- w3-content defines a container for fixed size centered content,
@@ -141,33 +143,61 @@
       <!-- END w3-content -->
     </div>
 
+    <button
+      type="button"
+      class="btn"
+      @click="showModal"
+    >
+      Open Modal!
+    </button>
+
+    <modal
+      v-show="isModalVisible"
+      @close="closeModal"
+    />
+
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+  import modal from '@/components/Modal.vue'
+  import imageModal from '@/components/ImageModal.vue'
+  import axios from 'axios';
 
-export default {
-  name: 'HelloWorld',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App',
-      posts: [],
-      errors: []
-    }
-  },
-  // Fetches posts when the component is created.
-  created() {
-    axios.get(`/api/Notes`)
-      .then(response => {
-        // JSON responses are automatically parsed.
-        this.posts = response.data
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
+  export default {
+    name: 'HelloWorld',
+    data () {
+      return {
+        isModalVisible: false,
+        msg: 'Welcome to Your Vue.js App',
+        posts: [],
+        errors: []
+      }
+    },
+    methods: {
+      showModal() {
+        this.isModalVisible = true;
+      },
+      closeModal() {
+        this.isModalVisible = false;
+      }
+    },
+    // Fetches posts when the component is created.
+    created() {
+      axios.get(`/api/Notes`)
+        .then(response => {
+          // JSON responses are automatically parsed.
+          this.posts = response.data
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
+    },
+    components: {
+      modal: modal,
+      imageModal: imageModal
+    },
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
