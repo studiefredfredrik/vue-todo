@@ -9,6 +9,10 @@
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white ">
           <img src="/w3images/bridge.jpg" alt="Norway" style="width:100%">
+          <croppa v-model="image.myCroppa"
+                  :width="700"
+                  :height="220"
+          ></croppa>
           <div class="w3-container">
             <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false;" v-model="heading.text"/>
             <h3><b v-if="!heading.editing" v-on:click="heading.editing = true;">{{heading.text}}</b></h3>
@@ -32,7 +36,7 @@
           <div class="w3-container">
             <div class="w3-row">
               <div class="w3-col m8 s12">
-                <p><button class="w3-button w3-padding-large w3-white w3-border"><b>Save</b></button></p>
+                <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()"><b>Save</b></button></p>
               </div>
             </div>
           </div>
@@ -44,10 +48,17 @@
 </template>
 
 <script>
+  import axios from 'axios';
+
   export default {
     name: 'modal',
     data: function() {
       return {
+        image: {
+          myCroppa: {},
+          image: null,
+          editing: false,
+        },
         heading: {
           text: `BLOG ENTRY`,
           editing: false,
@@ -71,9 +82,40 @@
       }
     },
     methods: {
+      savePost: function(){
+        console.log(this.image.myCroppa.generateDataUrl());
+
+        let post = {
+          image: this.image.myCroppa.generateDataUrl(),
+          heading: this.heading.text,
+          undertitle: this.undertitle.text,
+          description: this.description.text,
+          more: this.more.text,
+          type: 'equipment'
+        }
+        console.log('post', post);
+
+        axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
+          .then(response => {
+            // JSON responses are automatically parsed.
+            window.location.href = '/';
+          })
+          .catch(e => {
+            this.errors.push(e)
+          })
+      },
       close() {
         this.$emit('close');
       },
+      uploadCroppedImage() {
+        this.image.myCroppa.generateBlob(
+          blob => {
+            // write code to upload the cropped image file (a file is a blob)
+          },
+          'image/jpeg',
+          0.8
+        ); // 80% compressed jpeg file
+      }
     },
   };
 </script>

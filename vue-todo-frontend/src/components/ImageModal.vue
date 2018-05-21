@@ -37,6 +37,8 @@
             </div>
           </div>
 
+          <croppa v-model="myCroppa"></croppa>
+
         </div>
       </div>
     </div>
@@ -48,6 +50,7 @@
     name: 'imageModal',
     data: function() {
       return {
+        myCroppa: {},
         heading: {
           text: `BLOG ENTRY`,
           editing: false,
@@ -74,6 +77,15 @@
       close() {
         this.$emit('close');
       },
+      uploadCroppedImage() {
+        this.myCroppa.generateBlob(
+          blob => {
+            // write code to upload the cropped image file (a file is a blob)
+          },
+          'image/jpeg',
+          0.8
+        ); // 80% compressed jpeg file
+      }
     },
   };
 </script>
