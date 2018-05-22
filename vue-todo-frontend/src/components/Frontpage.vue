@@ -176,6 +176,10 @@
         })
         instance.$mount() // pass nothing
         this.$refs.container.appendChild(instance.$el)
+        instance.$on('close', function(){
+          instance.$el.remove()
+          instance.$destroy()
+        })
       },
       closeModal() {
         this.isModalVisible = false;
