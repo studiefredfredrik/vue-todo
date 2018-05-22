@@ -1,12 +1,30 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace VueTodoApi.Controllers
 {
-    public class LoginController
+    [Route("api/[controller]")]
+    public class LoginController : Controller
     {
+        [HttpPost]
+        public IActionResult Post([FromBody] LoginRequest login)
+        {
+            if(login.Username == "user" && login.Password == "password")
+            {
+                Ok();
+            }
+            Forbid();
+        }
+
+        public class LoginRequest
+        {
+            public string Username;
+            public string Password;
+        }
+
         /// <summary>
         /// Use the below code to generate symmetric Secret Key
         ///     var hmac = new HMACSHA256();

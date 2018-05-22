@@ -1,7 +1,7 @@
 
 
 <template>
-  <div class="w3-light-grey">
+  <div class="w3-light-grey" ref="container">
     <!-- w3-content defines a container for fixed size centered content,
     and is wrapped around the whole page content, except for the footer in this example -->
     <div class="w3-content" style="max-width:1400px">
@@ -29,7 +29,7 @@
               <p>{{post.description}}</p>
               <div class="w3-row">
                 <div class="w3-col m8 s12">
-                  <p><button class="w3-button w3-padding-large w3-white w3-border"><b @click="OpenModal()">READ MORE »</b></button></p>
+                  <p><button class="w3-button w3-padding-large w3-white w3-border"><b @click="showModal(post)">READ MORE »</b></button></p>
                 </div>
                 <!--<div class="w3-col m4 w3-hide-small">-->
                   <!--<p><span class="w3-padding-large w3-right"><b>Comments  </b> <span class="w3-tag">0</span></span></p>-->
@@ -154,6 +154,7 @@
   import modal from '@/components/Modal.vue'
   import imageModal from '@/components/ImageModal.vue'
   import axios from 'axios';
+  import Vue from 'vue'
 
   export default {
     name: 'Frontpage',
@@ -167,8 +168,14 @@
       }
     },
     methods: {
-      showModal() {
-        this.isModalVisible = true;
+      showModal(post) {
+        //this.isModalVisible = true;
+        let ComponentClass = Vue.extend(modal)
+        let instance = new ComponentClass({
+          propsData: { post: post}
+        })
+        instance.$mount() // pass nothing
+        this.$refs.container.appendChild(instance.$el)
       },
       closeModal() {
         this.isModalVisible = false;
