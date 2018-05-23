@@ -1,6 +1,6 @@
 <template>
   <transition name="modal-fade">
-    <div class="modal-backdrop" >
+    <div class="modal-backdrop" @click="close">
       <div class="modal max50" role="dialog">
         <div class="wrapper" v-on:click="close">
           <span class="close"></span>
@@ -74,7 +74,8 @@
       }
     },
     methods: {
-      close() {
+      close(e) {
+        console.log('inner', e.innerHTML)
         this.$emit('close');
       },
       uploadCroppedImage() {

@@ -29,7 +29,7 @@
               <p>{{post.description}}</p>
               <div class="w3-row">
                 <div class="w3-col m8 s12">
-                  <p><button class="w3-button w3-padding-large w3-white w3-border"><b @click="showModal(post)">READ MORE »</b></button></p>
+                  <p><button @click="showModal(post)" class="w3-button w3-padding-large w3-white w3-border"><b>READ MORE »</b></button></p>
                 </div>
                 <!--<div class="w3-col m4 w3-hide-small">-->
                   <!--<p><span class="w3-padding-large w3-right"><b>Comments  </b> <span class="w3-tag">0</span></span></p>-->
@@ -120,32 +120,32 @@
       <!-- END w3-content -->
     </div>
 
-    <button
-      type="button"
-      class="btn"
-      @click="showModal"
-    >
-      Open Modal!
-    </button>
+    <!--<button-->
+      <!--type="button"-->
+      <!--class="btn"-->
+      <!--@click="showModal"-->
+    <!--&gt;-->
+      <!--Open Modal!-->
+    <!--</button>-->
 
-    <modal
-      v-show="isModalVisible"
-      @close="closeModal"
-    />
+    <!--<modal-->
+      <!--v-show="isModalVisible"-->
+      <!--@close="closeModal"-->
+    <!--/>-->
 
 
-    <button
-      type="button"
-      class="btn"
-      @click="showModal2"
-    >
-      Open Modal2
-    </button>
+    <!--<button-->
+      <!--type="button"-->
+      <!--class="btn"-->
+      <!--@click="showModal2"-->
+    <!--&gt;-->
+      <!--Open Modal2-->
+    <!--</button>-->
 
-    <image-modal
-      v-show="isModalVisible2"
-      @close="closeModal2"
-    />
+    <!--<image-modal-->
+      <!--v-show="isModalVisible2"-->
+      <!--@close="closeModal2"-->
+    <!--/>-->
 
   </div>
 </template>
