@@ -1,13 +1,13 @@
 <template>
   <transition name="modal-fade">
-    <div class="modal-backdrop" >
+    <div class="modal-backdrop" id="backdrop" v-on:click="backdropClick">
       <div class="modal" role="dialog">
         <div class="wrapper" v-on:click="close">
           <span class="close"></span>
         </div>
 
         <!-- Blog entry -->
-        <div class="w3-card-4 w3-margin w3-white ">
+        <div class="w3-card-4 w3-margin w3-white">
           <img src="/w3images/bridge.jpg" alt="Norway" style="width:100%">
           <croppa v-model="image.myCroppa"
                   :width="700"
@@ -83,6 +83,10 @@
     },
     props: ['post'],
     methods: {
+      backdropClick: function(e){
+        if(e.target.id === 'backdrop')
+          this.$emit('close')
+      },
       savePost: function(){
         console.log(this.image.myCroppa.generateDataUrl());
 
@@ -105,7 +109,8 @@
             this.errors.push(e)
           })
       },
-      close() {
+      close(e) {
+        console.log('inner', e.innerHTML)
         this.$emit('close');
       },
     },
@@ -114,6 +119,38 @@
       if(this.post)
         this.heading.text = this.post.heading
 
+    },
+    directives: {
+      'click-outside': {
+        bind: function(el, binding, vNode) {
+          // Provided expression must evaluate to a function.
+          if (typeof binding.value !== 'function') {
+            const compName = vNode.context.name
+            let warn = `[Vue-click-outside:] provided expression '${binding.expression}' is not a function, but has to be`
+            if (compName) { warn += `Found in component '${compName}'` }
+
+            console.warn(warn)
+          }
+          // Define Handler and cache it on the element
+          const bubble = binding.modifiers.bubble
+          const handler = (e) => {
+            if (bubble || (!el.contains(e.target) && el !== e.target)) {
+              binding.value(e)
+            }
+          }
+          el.__vueClickOutside__ = handler
+
+          // add Event Listeners
+          document.addEventListener('click', handler)
+        },
+
+        unbind: function(el, binding) {
+          // Remove Event Listeners
+          document.removeEventListener('click', el.__vueClickOutside__)
+          el.__vueClickOutside__ = null
+
+        }
+      }
     }
   }
 </script>
