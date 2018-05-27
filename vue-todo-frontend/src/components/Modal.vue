@@ -8,8 +8,9 @@
 
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
-          <img src="/w3images/bridge.jpg" alt="Norway" style="width:100%">
-          <croppa v-model="image.myCroppa"
+          <img v-if="!image.editing && image.image" v-bind:src="image.image" style="width:100%" v-on:click="image.editing = true;">
+          <croppa v-if="image.editing"
+                  v-model="image.myCroppa"
                   :width="700"
                   :height="220"
           ></croppa>
@@ -79,6 +80,7 @@
           text: `Even more info here, with more details etc. And more more more`,
           editing: false,
         },
+        id: ''
       }
     },
     props: ['post'],
@@ -91,7 +93,7 @@
         console.log(this.image.myCroppa.generateDataUrl());
 
         let post = {
-          image: this.image.myCroppa.generateDataUrl(),
+          image: this.image.myCroppa.generateDataUrl() || this.image.image,
           heading: this.heading.text,
           undertitle: this.undertitle.text,
           description: this.description.text,
@@ -99,15 +101,26 @@
           type: 'equipment'
         }
         console.log('post', post);
+        if(this.id){
+          axios.put(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
+            .then(response => {
+              // JSON responses are automatically parsed.
+              window.location.href = '/';
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        } else{
+          axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
+            .then(response => {
+              // JSON responses are automatically parsed.
+              window.location.href = '/';
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        }
 
-        axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
-          .then(response => {
-            // JSON responses are automatically parsed.
-            window.location.href = '/';
-          })
-          .catch(e => {
-            this.errors.push(e)
-          })
       },
       close(e) {
         console.log('inner', e.innerHTML)
@@ -116,8 +129,16 @@
     },
     mounted(){
       console.log(this.post)
-      if(this.post)
+      if(this.post){
         this.heading.text = this.post.heading
+        this.undertitle.text = this.post.undertitle
+        this.description.text = this.post.description
+        this.more.text = this.post.more
+        this.image.image = this.post.image
+        if(!this.post.image) this.image.editing = true;
+        this.id = this.post.id
+      }
+
 
     },
     directives: {
