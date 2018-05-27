@@ -14,9 +14,9 @@ namespace VueTodoApi.Controllers
         {
             if(login.Username == "user" && login.Password == "password")
             {
-                Ok();
+                return Ok();
             }
-            Forbid();
+            return Forbid();
         }
 
         public class LoginRequest
