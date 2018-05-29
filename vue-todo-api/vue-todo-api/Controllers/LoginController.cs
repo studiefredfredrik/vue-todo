@@ -32,6 +32,9 @@ namespace VueTodoApi.Controllers
                 ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
                 await HttpContext.SignInAsync(principal);
 
+                // Also set a non-HttpOnly cookie for reading in javascript (not secure)
+                Response.Cookies.Append("user", login.Username);
+
                 return Redirect("/");
             }
             return Forbid();

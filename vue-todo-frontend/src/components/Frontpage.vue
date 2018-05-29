@@ -124,7 +124,8 @@
 </template>
 
 <script>
-  import modal from '@/components/Modal.vue'
+  import editpostmodal from '@/components/EditPostModal.vue'
+  import viewpostmodal from '@/components/ViewPostModal.vue'
   import axios from 'axios';
   import Vue from 'vue'
 
@@ -136,12 +137,14 @@
         isModalVisible2: false,
         msg: 'Welcome to Your Vue.js App',
         posts: [],
-        errors: []
+        errors: [],
+        loggedIn: false
       }
     },
     methods: {
       showModal(post) {
-        //this.isModalVisible = true;
+        console.log(this.loggedIn)
+        let modal = this.loggedIn ? editpostmodal : viewpostmodal
         let ComponentClass = Vue.extend(modal)
         let instance = new ComponentClass({
           propsData: { post: post}
@@ -156,15 +159,6 @@
           }
         }.bind(this))
       },
-      closeModal() {
-        this.isModalVisible = false;
-      },
-      showModal2() {
-        this.isModalVisible2 = true;
-      },
-      closeModal2() {
-        this.isModalVisible2 = false;
-      },
       getPosts: function () {
         axios.get(`/api/Notes`)
           .then(response => {
@@ -174,6 +168,12 @@
           .catch(e => {
             // TODO: Error toaster
           })
+      },
+    },
+    mounted(){
+      if(document.cookie.indexOf('user=') > -1){
+        this.loggedIn = true
+        console.log(document.cookie,document.cookie.indexOf('user='), this.loggedIn)
       }
     },
     // Fetches posts when the component is created.
@@ -181,7 +181,8 @@
       this.getPosts()
     },
     components: {
-      modal: modal
+      editpostmodal: editpostmodal,
+      viewpostmodal: viewpostmodal
     },
   }
 </script>
