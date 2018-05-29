@@ -8,11 +8,12 @@
 
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
-          <img v-if="!image.editing && image.image" v-bind:src="image.image" style="width:100%" v-on:click="image.editing = true;">
-          <croppa v-if="image.editing"
+          <img v-show="!image.editing && image.image" v-bind:src="image.image" style="width:100%" v-on:click="image.editing = true;">
+          <croppa v-show="image.editing"
                   v-model="image.myCroppa"
                   :width="700"
                   :height="220"
+                  :initial-image="image.image"
           ></croppa>
           <div class="w3-container">
             <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false;" v-model="heading.text"/>
@@ -38,6 +39,14 @@
             <div class="w3-row">
               <div class="w3-col m8 s12">
                 <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()"><b>Save</b></button></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="w3-container" v-if="id">
+            <div class="w3-row">
+              <div class="w3-col m8 s12">
+                <p><button class="w3-button w3-padding-large w3-white w3-border" @click="deletePost()"><b>Delete</b></button></p>
               </div>
             </div>
           </div>
@@ -85,50 +94,56 @@
     },
     props: ['post'],
     methods: {
+      handleNewImage: function(){
+        this.image.image = this.image.myCroppa.generateDataUrl()
+        this.image.editing = false
+      },
       backdropClick: function(e){
         if(e.target.id === 'backdrop')
           this.$emit('close')
       },
       savePost: function(){
-        console.log(this.image.myCroppa.generateDataUrl());
-
         let post = {
           image: this.image.myCroppa.generateDataUrl() || this.image.image,
           heading: this.heading.text,
           undertitle: this.undertitle.text,
           description: this.description.text,
           more: this.more.text,
+          id: this.id,
           type: 'equipment'
         }
-        console.log('post', post);
         if(this.id){
           axios.put(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
             .then(response => {
-              // JSON responses are automatically parsed.
-              window.location.href = '/';
+              this.$emit('close', true);
             })
             .catch(e => {
-              this.errors.push(e)
+              // TODO: Error toaster
             })
         } else{
           axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
             .then(response => {
-              // JSON responses are automatically parsed.
-              window.location.href = '/';
+              this.$emit('close', true);
             })
             .catch(e => {
-              this.errors.push(e)
+              // TODO: Error toaster
             })
         }
-
+      },
+      deletePost: function(){
+        axios.delete(`/api/Notes?id=${id}&password=PeopleCantPostWithoutPlaying`)
+          .then(response => {
+            this.$emit('close', true);
+          })
+          .catch(e => {
+            // TODO: Error toaster
+          })
       },
       close(e) {
-        console.log('inner', e.innerHTML)
-        this.$emit('close');
+        this.$emit('close', false);
       },
     },
     mounted(){
-      console.log(this.post)
       if(this.post){
         this.heading.text = this.post.heading
         this.undertitle.text = this.post.undertitle
@@ -137,40 +152,6 @@
         this.image.image = this.post.image
         if(!this.post.image) this.image.editing = true;
         this.id = this.post.id
-      }
-
-
-    },
-    directives: {
-      'click-outside': {
-        bind: function(el, binding, vNode) {
-          // Provided expression must evaluate to a function.
-          if (typeof binding.value !== 'function') {
-            const compName = vNode.context.name
-            let warn = `[Vue-click-outside:] provided expression '${binding.expression}' is not a function, but has to be`
-            if (compName) { warn += `Found in component '${compName}'` }
-
-            console.warn(warn)
-          }
-          // Define Handler and cache it on the element
-          const bubble = binding.modifiers.bubble
-          const handler = (e) => {
-            if (bubble || (!el.contains(e.target) && el !== e.target)) {
-              binding.value(e)
-            }
-          }
-          el.__vueClickOutside__ = handler
-
-          // add Event Listeners
-          document.addEventListener('click', handler)
-        },
-
-        unbind: function(el, binding) {
-          // Remove Event Listeners
-          document.removeEventListener('click', el.__vueClickOutside__)
-          el.__vueClickOutside__ = null
-
-        }
       }
     }
   }
@@ -181,9 +162,11 @@
     position: relative;
     display: inline-block;
   }
+
   .close:before {
     content: '✕';
   }
+
   .close {
     position: absolute;
     top: 0;
@@ -241,20 +224,4 @@
     padding: 20px 10px;
   }
 
-  .btn-close {
-    border: none;
-    font-size: 20px;
-    padding: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #4AAE9B;
-    background: transparent;
-  }
-
-  .btn-green {
-    color: white;
-    background: #4AAE9B;
-    border: 1px solid #4AAE9B;
-    border-radius: 2px;
-  }
 </style>

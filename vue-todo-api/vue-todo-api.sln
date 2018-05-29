@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vue-todo-api", "vue-todo-api\vue-todo-api.csproj", "{3C8B2D7D-68EC-495A-B738-FB350BD6B1D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VueTodoApi", "vue-todo-api\VueTodoApi.csproj", "{3C8B2D7D-68EC-495A-B738-FB350BD6B1D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
