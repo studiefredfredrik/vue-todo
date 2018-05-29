@@ -120,39 +120,11 @@
       <!-- END w3-content -->
     </div>
 
-    <!--<button-->
-      <!--type="button"-->
-      <!--class="btn"-->
-      <!--@click="showModal"-->
-    <!--&gt;-->
-      <!--Open Modal!-->
-    <!--</button>-->
-
-    <!--<modal-->
-      <!--v-show="isModalVisible"-->
-      <!--@close="closeModal"-->
-    <!--/>-->
-
-
-    <!--<button-->
-      <!--type="button"-->
-      <!--class="btn"-->
-      <!--@click="showModal2"-->
-    <!--&gt;-->
-      <!--Open Modal2-->
-    <!--</button>-->
-
-    <!--<image-modal-->
-      <!--v-show="isModalVisible2"-->
-      <!--@close="closeModal2"-->
-    <!--/>-->
-
   </div>
 </template>
 
 <script>
   import modal from '@/components/Modal.vue'
-  import imageModal from '@/components/ImageModal.vue'
   import axios from 'axios';
   import Vue from 'vue'
 
@@ -176,10 +148,13 @@
         })
         instance.$mount() // pass nothing
         this.$refs.container.appendChild(instance.$el)
-        instance.$on('close', function(){
+        instance.$on('close', function(refresh){
           instance.$el.remove()
           instance.$destroy()
-        })
+          if(refresh){
+            this.getPosts()
+          }
+        }.bind(this))
       },
       closeModal() {
         this.isModalVisible = false;
@@ -189,22 +164,24 @@
       },
       closeModal2() {
         this.isModalVisible2 = false;
+      },
+      getPosts: function () {
+        axios.get(`/api/Notes`)
+          .then(response => {
+            // JSON responses are automatically parsed.
+            this.posts = response.data
+          })
+          .catch(e => {
+            // TODO: Error toaster
+          })
       }
     },
     // Fetches posts when the component is created.
     created() {
-      axios.get(`/api/Notes`)
-        .then(response => {
-          // JSON responses are automatically parsed.
-          this.posts = response.data
-        })
-        .catch(e => {
-          this.errors.push(e)
-        })
+      this.getPosts()
     },
     components: {
-      modal: modal,
-      imageModal: imageModal
+      modal: modal
     },
   }
 </script>
