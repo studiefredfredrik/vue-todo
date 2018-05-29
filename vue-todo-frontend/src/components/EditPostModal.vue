@@ -28,9 +28,10 @@
               {{description.text}}
             </p>
 
-            <input class="widt100" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"/>
+            <!--<input class="widt100" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"/>-->
+            <textarea class="widt100" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"></textarea>
             <p v-if="!more.editing" v-on:click="more.editing = true;">
-              {{more.text}}
+              <vue-markdown>{{more.text}}</vue-markdown>
             </p>
             <br>
           </div>
@@ -59,6 +60,7 @@
 
 <script>
   import axios from 'axios';
+  import VueMarkdown from 'vue-markdown'
 
   export default {
     name: 'editpostmodal',
@@ -153,7 +155,10 @@
         if(!this.post.image) this.image.editing = true;
         this.id = this.post.id
       }
-    }
+    },
+    components: {
+      VueMarkdown
+    },
   }
 </script>
 
