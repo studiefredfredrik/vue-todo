@@ -127,6 +127,7 @@
   import editpostmodal from '@/components/EditPostModal.vue'
   import viewpostmodal from '@/components/ViewPostModal.vue'
   import axios from 'axios';
+
   import Vue from 'vue'
 
   export default {
