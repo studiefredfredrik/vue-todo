@@ -9,7 +9,6 @@ using VueTodoApi.Models;
 
 namespace VueTodoApi.Controllers
 {
-    
     [Route("api/[controller]")]
     public class NotesController : Controller
     {
