@@ -61,7 +61,7 @@
   import axios from 'axios';
 
   export default {
-    name: 'modal',
+    name: 'editpostmodal',
     data: function() {
       return {
         image: {
