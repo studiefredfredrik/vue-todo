@@ -9,7 +9,7 @@ using VueTodoApi.Models;
 
 namespace VueTodoApi.Controllers
 {
-    [Authorize]
+    
     [Route("api/[controller]")]
     public class NotesController : Controller
     {
@@ -34,10 +34,10 @@ namespace VueTodoApi.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult Post([FromBody]NotesDocument note, string password)
         {
-            if (password != _highScoreSettings.SuperSecretApplicationKey) return Forbid();
             if (!string.IsNullOrEmpty(note.Id)) return BadRequest("Note Id is already populated");
 
             note.TimeOfEntry = DateTime.Now;
@@ -49,10 +49,10 @@ namespace VueTodoApi.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPut]
         public IActionResult Put([FromBody]NotesDocument note, string password)
         {
-            if (password != _highScoreSettings.SuperSecretApplicationKey) return Forbid();
             if (string.IsNullOrEmpty(note.Id)) return BadRequest("Note does not have an Id");
 
             note.TimeOfEntry = DateTime.Now;
@@ -64,11 +64,10 @@ namespace VueTodoApi.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete]
         public IActionResult Delete(string id, string password)
         {
-            if (password != _highScoreSettings.SuperSecretApplicationKey) return Forbid();
-
             using (var session = _store.OpenSession())
             {
                 session.Delete(id);
