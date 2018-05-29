@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.IdentityModel.Tokens;
 using System.IO;
+using System.Threading.Tasks;
 using VueTodoApi.Configuration;
-using VueTodoApi.Middleware;
-using static VueTodoApi.Controllers.LoginController.JwtTokenBuilder;
 
 namespace VueTodoApi
 {
@@ -33,22 +31,14 @@ namespace VueTodoApi
             var notesSettings = Configuration.GetSection("NotesSettings").Get<NotesSettings>();
             services.AddSingleton(notesSettings);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options => {
-                        options.TokenValidationParameters =
-                             new TokenValidationParameters
-                             {
-                                 ValidateIssuer = true,
-                                 ValidateAudience = true,
-                                 ValidateLifetime = true,
-                                 ValidateIssuerSigningKey = true,
-
-                                 ValidIssuer = "VueTodoApi",
-                                 ValidAudience = "VueTodoApi",
-                                 IssuerSigningKey =
-                                 JwtSecurityKey.Create("fiversecret ")
-                             };
-                    });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => {
+                    options.Events.OnRedirectToLogin = (context) =>
+                    {
+                        context.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    };
+                });
 
             services.AddMvc();
         }
@@ -70,8 +60,7 @@ namespace VueTodoApi
             staticFileOptions.FileProvider = new PhysicalFileProvider(distFolder);
             app.UseStaticFiles(staticFileOptions);
 
-            //app.UseMiddleware<TokenParserMiddleware>();
-
+            app.UseDeveloperExceptionPage();
             app.UseAuthentication();
 
 
