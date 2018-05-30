@@ -1,7 +1,7 @@
 <template>
   <transition name="modal-fade">
-    <div class="modal-backdrop" id="backdrop" v-on:click="backdropClick">
-      <div class="modal" role="dialog">
+    <div class="modal-backdrop" id="backdrop" @click="backdropClick">
+      <div class="modal" id="modal" role="dialog" @click="modalClick">
         <div class="wrapper" v-on:click="close">
           <span class="close"></span>
         </div>
@@ -18,17 +18,14 @@
           <div class="w3-container">
             <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false;" v-model="heading.text"/>
             <h3><b v-if="!heading.editing" v-on:click="heading.editing = true;">{{heading.text}}</b></h3>
-            <input type="text" v-if="undertitle.editing" v-on:blur="undertitle.editing = false;" v-model="undertitle.text"/>
-            <h5 v-if="!undertitle.editing" v-on:click="undertitle.editing = true;">{{undertitle.text}}</h5>
           </div>
 
-          <div class="w3-container">
-            <input type="text" class="widt100" v-if="description.editing" v-on:blur="description.editing = false;" v-model="description.text"/>
+          <div class="w3-container" id="text">
+            <textarea type="text" class="widt100" v-if="description.editing" v-on:blur="description.editing = false;" v-model="description.text"></textarea>
             <p id="description" v-if="!description.editing" v-on:click="description.editing = true;">
-              {{description.text}}
+              <vue-markdown>{{description.text}}</vue-markdown>
             </p>
 
-            <!--<input class="widt100" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"/>-->
             <textarea class="widt100" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"></textarea>
             <p v-if="!more.editing" v-on:click="more.editing = true;">
               <vue-markdown>{{more.text}}</vue-markdown>
@@ -38,15 +35,10 @@
 
           <div class="w3-container">
             <div class="w3-row">
-              <div class="w3-col m8 s12">
+              <div class="w3-col m2 s1">
                 <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()"><b>Save</b></button></p>
               </div>
-            </div>
-          </div>
-
-          <div class="w3-container" v-if="id">
-            <div class="w3-row">
-              <div class="w3-col m8 s12">
+              <div class="w3-col m4 s6">
                 <p><button class="w3-button w3-padding-large w3-white w3-border" @click="deletePost()"><b>Delete</b></button></p>
               </div>
             </div>
@@ -75,10 +67,6 @@
           text: `BLOG ENTRY`,
           editing: false,
         },
-        undertitle: {
-          text: `Praesent tincidunt sed`,
-          editing: false,
-        },
         description: {
           text: `Mauris neque quam, fermentum ut nisl vitae, convallis maximus nisl.
                   Sed mattis nunc id lorem euismod placerat.
@@ -104,11 +92,18 @@
         if(e.target.id === 'backdrop')
           this.$emit('close')
       },
+      modalClick: function(e) {
+        // A simple outside-click handler
+        if(e.target.localName === 'div'){
+          this.heading.editing = false
+          this.description.editing = false
+          this.more.editing = false
+        }
+      },
       savePost: function(){
         let post = {
           image: this.image.myCroppa.generateDataUrl() || this.image.image,
           heading: this.heading.text,
-          undertitle: this.undertitle.text,
           description: this.description.text,
           more: this.more.text,
           id: this.id,
@@ -133,7 +128,7 @@
         }
       },
       deletePost: function(){
-        axios.delete(`/api/Notes?id=${id}&password=PeopleCantPostWithoutPlaying`)
+        axios.delete(`/api/Notes?id=${this.id}&password=PeopleCantPostWithoutPlaying`)
           .then(response => {
             this.$emit('close', true);
           })
@@ -148,7 +143,6 @@
     mounted(){
       if(this.post){
         this.heading.text = this.post.heading
-        this.undertitle.text = this.post.undertitle
         this.description.text = this.post.description
         this.more.text = this.post.more
         this.image.image = this.post.image
@@ -158,7 +152,7 @@
     },
     components: {
       VueMarkdown
-    },
+    }
   }
 </script>
 
@@ -205,28 +199,6 @@
     overflow-x: auto;
     display: flex;
     flex-direction: column;
-  }
-
-  .modal-header,
-  .modal-footer {
-    padding: 15px;
-    display: flex;
-  }
-
-  .modal-header {
-    border-bottom: 1px solid #eeeeee;
-    color: #4AAE9B;
-    justify-content: space-between;
-  }
-
-  .modal-footer {
-    border-top: 1px solid #eeeeee;
-    justify-content: flex-end;
-  }
-
-  .modal-body {
-    position: relative;
-    padding: 20px 10px;
   }
 
 </style>
