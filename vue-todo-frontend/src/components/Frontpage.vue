@@ -117,13 +117,14 @@
 
       <!-- END w3-content -->
     </div>
-
   </div>
+
 </template>
 
 <script>
   import editpostmodal from '@/components/EditPostModal.vue'
   import viewpostmodal from '@/components/ViewPostModal.vue'
+  import paymentmodal from '@/components/PaymentModal.vue'
   import axios from 'axios';
 
   import Vue from 'vue'
@@ -143,7 +144,6 @@
     },
     methods: {
       showModal(post) {
-        console.log(this.loggedIn)
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
         let ComponentClass = Vue.extend(modal)
         let instance = new ComponentClass({
@@ -181,9 +181,10 @@
       this.getPosts()
     },
     components: {
+      VueMarkdown,
       editpostmodal,
       viewpostmodal,
-      VueMarkdown
+      paymentmodal
     },
   }
 </script>
