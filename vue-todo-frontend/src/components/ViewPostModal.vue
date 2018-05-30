@@ -6,21 +6,19 @@
           <span class="close"></span>
         </div>
 
-        <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
           <img v-bind:src="post.image" style="width:100%">
           <div class="w3-container">
             <h3><b>{{post.heading}}</b></h3>
-            <h5>{{post.undertitle}}</h5>
           </div>
 
           <div class="w3-container">
             <p id="description">
-              {{post.description}}
+              <vue-markdown>{{post.description}}</vue-markdown>
             </p>
 
             <p>
-              {{post.more}}
+              <vue-markdown>{{post.more}}</vue-markdown>
             </p>
             <br>
           </div>
@@ -32,6 +30,8 @@
 </template>
 
 <script>
+  import VueMarkdown from 'vue-markdown'
+
   export default {
     name: 'viewpostmodal',
     props: ['post'],
@@ -43,6 +43,9 @@
       close(e) {
         this.$emit('close', false);
       },
+    },
+    components: {
+      VueMarkdown
     }
   }
 </script>
@@ -68,10 +71,6 @@
     width: 732px;
   }
 
-  .widt100{
-    width: 100%;
-  }
-
   .modal-backdrop {
     position: fixed;
     top: 0;
@@ -90,28 +89,6 @@
     overflow-x: auto;
     display: flex;
     flex-direction: column;
-  }
-
-  .modal-header,
-  .modal-footer {
-    padding: 15px;
-    display: flex;
-  }
-
-  .modal-header {
-    border-bottom: 1px solid #eeeeee;
-    color: #4AAE9B;
-    justify-content: space-between;
-  }
-
-  .modal-footer {
-    border-top: 1px solid #eeeeee;
-    justify-content: flex-end;
-  }
-
-  .modal-body {
-    position: relative;
-    padding: 20px 10px;
   }
 
 </style>
