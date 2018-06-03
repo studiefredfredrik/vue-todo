@@ -21,12 +21,12 @@
           </div>
 
           <div class="w3-container" id="text">
-            <textarea type="text" class="widt100" v-if="description.editing" v-on:blur="description.editing = false;" v-model="description.text"></textarea>
+            <textarea type="text" rows="10" class="widt100" v-if="description.editing" v-on:blur="description.editing = false;" v-model="description.text"></textarea>
             <p id="description" v-if="!description.editing" v-on:click="description.editing = true;">
               <vue-markdown>{{description.text}}</vue-markdown>
             </p>
 
-            <textarea class="widt100" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"></textarea>
+            <textarea class="widt100" rows="10" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"></textarea>
             <p v-if="!more.editing" v-on:click="more.editing = true;">
               <vue-markdown>{{more.text}}</vue-markdown>
             </p>
@@ -53,6 +53,7 @@
 <script>
   import axios from 'axios';
   import VueMarkdown from 'vue-markdown'
+  import toaster from '@/components/ToasterModule'
 
   export default {
     name: 'editpostmodal',
@@ -115,7 +116,7 @@
               this.$emit('close', true);
             })
             .catch(e => {
-              // TODO: Error toaster
+              toaster.show('An error occurred saving the post on the server')
             })
         } else{
           axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
@@ -123,7 +124,7 @@
               this.$emit('close', true);
             })
             .catch(e => {
-              // TODO: Error toaster
+              toaster.show('An error occurred saving the post on the server')
             })
         }
       },
@@ -133,7 +134,7 @@
             this.$emit('close', true);
           })
           .catch(e => {
-            // TODO: Error toaster
+            toaster.show('An error occurred deleting the post on the server')
           })
       },
       close(e) {
