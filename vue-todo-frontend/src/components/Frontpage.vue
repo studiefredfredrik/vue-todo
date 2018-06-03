@@ -1,5 +1,3 @@
-
-
 <template>
   <div class="w3-light-grey" ref="container">
     <!-- w3-content defines a container for fixed size centered content,
@@ -117,6 +115,9 @@
 
       <!-- END w3-content -->
     </div>
+
+    <a href="/api/login" class="loginlink">Go to login</a>
+
   </div>
 
 </template>
@@ -125,10 +126,12 @@
   import editpostmodal from '@/components/EditPostModal.vue'
   import viewpostmodal from '@/components/ViewPostModal.vue'
   import paymentmodal from '@/components/PaymentModal.vue'
-  import axios from 'axios';
 
   import Vue from 'vue'
+  import axios from 'axios';
   import VueMarkdown from 'vue-markdown'
+
+  import toaster from '@/components/ToasterModule'
 
   export default {
     name: 'Frontpage',
@@ -166,14 +169,13 @@
             this.posts = response.data
           })
           .catch(e => {
-            // TODO: Error toaster
+            toaster.show('An error occurred getting the posts from the server')
           })
       },
     },
     mounted(){
       if(document.cookie.indexOf('user=') > -1){
         this.loggedIn = true
-        console.log(document.cookie,document.cookie.indexOf('user='), this.loggedIn)
       }
     },
     // Fetches posts when the component is created.
@@ -193,5 +195,12 @@
 <style scoped>
   body,h1,h2,h3,h4,h5 {
     font-family: "Raleway", sans-serif
+  }
+
+  .loginlink {
+    font-size: 10px;
+    color: gray;
+    font-family: "Raleway", sans-serif;
+    margin-left: 10px;
   }
 </style>

@@ -13,12 +13,10 @@ namespace VueTodoApi.Controllers
     public class NotesController : Controller
     {
         readonly IDocumentStore _store;
-        readonly NotesSettings _highScoreSettings;
 
-        public NotesController(IDocumentStore store, NotesSettings highScoreSettings)
+        public NotesController(IDocumentStore store)
         {
             _store = store;
-            _highScoreSettings = highScoreSettings;
         }
 
         [HttpGet]
