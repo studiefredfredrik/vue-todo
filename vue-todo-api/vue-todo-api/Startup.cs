@@ -28,9 +28,6 @@ namespace VueTodoApi
             var ravenConfig = Configuration.GetSection("RavenDbSettings").Get<RavenDbSettings>();
             services.AddSingleton(RavenDbConfiguration.Configure(ravenConfig));
 
-            var notesSettings = Configuration.GetSection("NotesSettings").Get<NotesSettings>();
-            services.AddSingleton(notesSettings);
-
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => {
                     options.Events.OnRedirectToLogin = (context) =>
