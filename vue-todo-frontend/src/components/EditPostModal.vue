@@ -111,7 +111,7 @@
           type: 'equipment'
         }
         if(this.id){
-          axios.put(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
+          axios.put(`/api/Notes`, post)
             .then(response => {
               this.$emit('close', true);
             })
@@ -119,7 +119,7 @@
               toaster.show('An error occurred saving the post on the server')
             })
         } else{
-          axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
+          axios.post(`/api/Notes`, post)
             .then(response => {
               this.$emit('close', true);
             })

@@ -101,30 +101,20 @@
       },
       save: function(){
         let post = {
-          image: this.image.myCroppa.generateDataUrl() || this.image.image,
-          heading: this.heading.text,
-          description: this.description.text,
-          more: this.more.text,
-          id: this.id,
-          type: 'equipment'
+          heading : this.page.heading.text,
+          undertitle: this.page.undertitle.text,
+          sidebar: {
+            image: this.sidebar.image.myCroppa.generateDataUrl() || this.sidebar.image.image,
+            description: this.sidebar.description.text
+          }
         }
-        if(this.id){
-          axios.put(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
-            .then(response => {
-              this.$emit('close', true);
-            })
-            .catch(e => {
-              toaster.show('An error occurred saving the post on the server')
-            })
-        } else{
-          axios.post(`/api/Notes?password=PeopleCantPostWithoutPlaying`, post)
-            .then(response => {
-              this.$emit('close', true);
-            })
-            .catch(e => {
-              toaster.show('An error occurred saving the post on the server')
-            })
-        }
+        axios.put(`/api/Frontpage`, post)
+          .then(response => {
+            this.$emit('close', true);
+          })
+          .catch(e => {
+            toaster.show('An error occurred saving the post on the server')
+        })
       },
       close(e) {
         this.$emit('close', false);
