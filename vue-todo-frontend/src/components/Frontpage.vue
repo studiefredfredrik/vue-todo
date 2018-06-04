@@ -5,7 +5,7 @@
     <div class="w3-content" style="max-width:1400px">
 
       <!-- Header -->
-      <header class="w3-container w3-center w3-padding-32">
+      <header class="w3-container w3-center w3-padding-32" @click="showFrontpageModal()">
         <h1><b>{{frontpage.heading}}</b></h1>
         <p>{{frontpage.undertitle}}</p>
       </header>
@@ -182,7 +182,7 @@
           instance.$el.remove()
           instance.$destroy()
           if(refresh){
-            this.getPosts()
+            this.getPage()
           }
         }.bind(this))
       },

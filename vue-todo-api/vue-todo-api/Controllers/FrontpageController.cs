@@ -30,13 +30,18 @@ namespace VueTodoApi.Controllers
 
         [Authorize]
         [HttpPut]
-        public IActionResult Put([FromBody]FrontpageDocument frontpage, string password)
+        public IActionResult Put([FromBody]FrontpageDocument frontpage)
         {
             using (var session = _store.OpenSession())
             {
                 var currentFrontpage = session.Query<FrontpageDocument>().FirstOrDefault();
-                frontpage.Id = currentFrontpage?.Id;
-                session.Store(frontpage);
+                if (currentFrontpage == null) session.Store(frontpage);
+                else
+                {
+                    session.Delete(currentFrontpage.Id);
+                    session.SaveChanges();
+                    session.Store(frontpage, currentFrontpage.Id);
+                }
                 session.SaveChanges();
             }
             return Ok();
