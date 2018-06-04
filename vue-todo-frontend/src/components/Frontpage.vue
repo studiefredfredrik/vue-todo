@@ -6,8 +6,8 @@
 
       <!-- Header -->
       <header class="w3-container w3-center w3-padding-32">
-        <h1><b>MY BLOG</b></h1>
-        <p>Welcome to the blog of <span class="w3-tag">unknown</span></p>
+        <h1><b>{{frontpage.heading}}</b></h1>
+        <p>{{frontpage.undertitle}}</p>
       </header>
 
       <!-- Grid -->
@@ -17,7 +17,7 @@
         <div class="w3-col l8 s12">
 
           <div class="w3-card-4 w3-margin w3-white" v-for="(post, index) in posts">
-            <img :src="post.image" alt="Nature" style="width:100%">
+            <img v-bind:src="post.image" alt="Nature" style="width:100%">
             <div class="w3-container">
               <h3><b>{{post.heading}}</b></h3>
             </div>
@@ -40,11 +40,12 @@
         <!-- Introduction menu -->
         <div class="w3-col l4">
           <!-- About Card -->
-          <div class="w3-card w3-margin w3-margin-top">
-            <img src="/w3images/avatar_g.jpg" style="width:100%">
+          <div class="w3-card w3-margin w3-margin-top" @click="showFrontpageModal()">
+            <img v-bind:src="sidebar.image"  style="width:100%">
             <div class="w3-container w3-white">
-              <h4><b>My Name</b></h4>
-              <p>Just me, myself and I, exploring the universe of uknownment. I have a heart of love and a interest of lorem ipsum and mauris neque quam blog. I want to share my world with you.</p>
+              <p v-if="sidebar.description">
+                <vue-markdown>{{sidebar.description}}</vue-markdown>
+              </p>
             </div>
           </div><hr>
 
@@ -126,6 +127,7 @@
   import editpostmodal from '@/components/EditPostModal.vue'
   import viewpostmodal from '@/components/ViewPostModal.vue'
   import paymentmodal from '@/components/PaymentModal.vue'
+  import editfrontpagemodal from '@/components/EditFrontpageModal.vue'
 
   import Vue from 'vue'
   import axios from 'axios';
@@ -135,22 +137,44 @@
 
   export default {
     name: 'Frontpage',
-    data () {
+    data: function () {
       return {
         isModalVisible: false,
         isModalVisible2: false,
         msg: 'Welcome to Your Vue.js App',
         posts: [],
         errors: [],
+        frontpage: {},
+        sidebar: {},
         loggedIn: false
       }
     },
     methods: {
+      getSidebarImage(){
+        if(this.page.sidebar)
+          return this.page.sidebar.image
+      },
       showModal(post) {
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
         let ComponentClass = Vue.extend(modal)
         let instance = new ComponentClass({
           propsData: { post: post}
+        })
+        instance.$mount() // pass nothing
+        this.$refs.container.appendChild(instance.$el)
+        instance.$on('close', function(refresh){
+          instance.$el.remove()
+          instance.$destroy()
+          if(refresh){
+            this.getPosts()
+          }
+        }.bind(this))
+      },
+      showFrontpageModal : function(){
+        if(!this.loggedIn) return
+        let ComponentClass = Vue.extend(editfrontpagemodal)
+        let instance = new ComponentClass({
+          propsData: { frontpage: this.frontpage }
         })
         instance.$mount() // pass nothing
         this.$refs.container.appendChild(instance.$el)
@@ -172,6 +196,17 @@
             toaster.show('An error occurred getting the posts from the server')
           })
       },
+      getPage: function () {
+        axios.get(`/api/Frontpage`)
+          .then(response => {
+            // JSON responses are automatically parsed.
+            this.frontpage = response.data
+            this.sidebar = response.data.sidebar
+          })
+          .catch(e => {
+            toaster.show('An error occurred getting the posts from the server')
+          })
+      },
     },
     mounted(){
       if(document.cookie.indexOf('user=') > -1){
@@ -180,13 +215,15 @@
     },
     // Fetches posts when the component is created.
     created() {
+      this.getPage()
       this.getPosts()
     },
     components: {
       VueMarkdown,
       editpostmodal,
       viewpostmodal,
-      paymentmodal
+      paymentmodal,
+      editfrontpagemodal
     },
   }
 </script>

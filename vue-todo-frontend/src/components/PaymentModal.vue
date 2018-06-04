@@ -7,7 +7,7 @@
         </div>
 
         <div class="w3-card-4 w3-margin w3-white">
-          <img v-bind:src="post.image" style="width:100%">
+          <img src="image" style="width:100%">
           <div class="w3-container">
             <h3><b>{{post.heading}}</b></h3>
           </div>
