@@ -47,19 +47,10 @@ namespace VueTodoApi
                 app.UseDeveloperExceptionPage();
             }
 
-            var option = new RewriteOptions();
-            option.AddRedirect("^$", "index.html"); // Matches on empty string
-            app.UseRewriter(option);
-
-            var currentDir = Directory.GetCurrentDirectory();
-            var distFolder = Path.Combine(currentDir, "../../vue-todo-frontend/dist");
-            var staticFileOptions = new StaticFileOptions();
-            staticFileOptions.FileProvider = new PhysicalFileProvider(distFolder);
-            app.UseStaticFiles(staticFileOptions);
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseDeveloperExceptionPage();
             app.UseAuthentication();
-
 
             app.UseMvc();
         }
