@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace VueTodoApi.Controllers
@@ -41,6 +42,7 @@ namespace VueTodoApi.Controllers
             if (await UserExists(login.Username) != true)
             {
                 await CreateUser(login.Username, login.Password);
+                Thread.Sleep(1000); // Easies way to ensure raven has persisted the changes before re-login
             }
 
             if(await VerifyUserLogin(login.Username, login.Password))

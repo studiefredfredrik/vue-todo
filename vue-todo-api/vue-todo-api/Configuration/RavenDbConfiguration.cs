@@ -1,4 +1,7 @@
-﻿using Raven.Client.Documents;
+﻿using System;
+using Raven.Client.Documents;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 
 namespace VueTodoApi.Configuration
 {
@@ -13,6 +16,12 @@ namespace VueTodoApi.Configuration
             };
 
             documentStore.Initialize();
+            
+            try {
+                documentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(documentStore.Database)));
+            } catch(Exception e) {
+                // database exists
+            }
 
             return documentStore;
         }
