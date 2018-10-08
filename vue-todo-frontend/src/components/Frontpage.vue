@@ -10,6 +10,11 @@
         <p>{{frontpage.undertitle}}</p>
       </header>
 
+      <!-- Add new post button -->
+      <p v-if="loggedIn" class="create-post-button">
+        <button @click="showModal()" class="w3-button w3-white w3-card-4">Create blog post</button>
+      </p>
+
       <!-- Grid -->
       <div class="w3-row">
 
@@ -239,5 +244,10 @@
     color: gray;
     font-family: "Raleway", sans-serif;
     margin-left: 10px;
+  }
+
+  .create-post-button{
+    float: right;
+    margin: 18px;
   }
 </style>
