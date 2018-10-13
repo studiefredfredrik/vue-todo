@@ -8,12 +8,11 @@
 
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
-          <img v-show="!image.editing && image.image" v-bind:src="image.image" style="width:100%" v-on:click="image.editing = true;">
-          <croppa v-show="image.editing"
-                  v-model="image.myCroppa"
+          <!--<img v-show="!image.editing && image.image" v-bind:src="getImageUrl('header')" style="width:100%" v-on:click="image.editing = true;">-->
+          <croppa v-model="image.myCroppa"
                   :width="700"
                   :height="220"
-                  :initial-image="image.image"
+                  :initial-image="getImageUrl('header')"
           ></croppa>
           <div class="w3-container">
             <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false;" v-model="heading.text"/>
@@ -86,7 +85,7 @@
     props: ['post'],
     methods: {
       handleNewImage: function(){
-        this.image.image = this.image.myCroppa.generateDataUrl()
+        // this.uploadCroppedImage('header')
         this.image.editing = false
       },
       backdropClick: function(e){
@@ -102,8 +101,8 @@
         }
       },
       savePost: function(){
+
         let post = {
-          image: this.image.myCroppa.generateDataUrl() || this.image.image,
           heading: this.heading.text,
           description: this.description.text,
           more: this.more.text,
@@ -111,6 +110,7 @@
           type: 'equipment'
         }
         if(this.id){
+          this.uploadCroppedImage(this.id, 'header')
           axios.put(`/api/Notes`, post)
             .then(response => {
               this.$emit('close', true);
@@ -121,6 +121,7 @@
         } else{
           axios.post(`/api/Notes`, post)
             .then(response => {
+              this.uploadCroppedImage(response.data.id, 'header')
               this.$emit('close', true);
             })
             .catch(e => {
@@ -129,7 +130,7 @@
         }
       },
       deletePost: function(){
-        axios.delete(`/api/Notes?id=${this.id}&password=PeopleCantPostWithoutPlaying`)
+        axios.delete(`/api/Notes?id=${this.id}`)
           .then(response => {
             this.$emit('close', true);
           })
@@ -140,6 +141,26 @@
       close(e) {
         this.$emit('close', false);
       },
+      getImageUrl(imageName){
+        return `/api/Image?noteId=${this.id}&imageName=${imageName}`
+      },
+      uploadCroppedImage(noteId, imageName) {
+        this.image.myCroppa.generateBlob(
+          blob => {
+            let formData = new FormData();
+            formData.append('files[0]', blob);
+            axios.post(`/api/Image/?noteId=${noteId}&imageName=${imageName}`, formData, {headers: {'Content-Type': `multipart/form-data; boundary=${formData.boundary}`}})
+              .then(response => {
+                toaster.show(`Image saved as ${response.data.guid}`)
+              })
+              .catch(e => {
+                toaster.show('An error occurred saving the post on the server')
+              })
+          },
+          'image/jpeg',
+          0.8
+        ); // 80% compressed jpeg file
+      }
     },
     mounted(){
       if(this.post){

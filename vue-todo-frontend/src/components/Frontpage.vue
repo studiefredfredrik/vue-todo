@@ -22,7 +22,7 @@
         <div class="w3-col l8 s12">
 
           <div class="w3-card-4 w3-margin w3-white" v-for="(post, index) in posts">
-            <img v-bind:src="post.image" alt="Nature" style="width:100%">
+            <img v-bind:src="getImageUrl(post.Id)" alt="Nature" style="width:100%">
             <div class="w3-container">
               <h3><b>{{post.heading}}</b></h3>
             </div>
@@ -158,6 +158,9 @@
       getSidebarImage(){
         if(this.page.sidebar)
           return this.page.sidebar.image
+      },
+      getImageUrl(noteId){
+        return `/api/Image/?noteId=${noteId}&imageName=header`
       },
       showModal(post) {
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
