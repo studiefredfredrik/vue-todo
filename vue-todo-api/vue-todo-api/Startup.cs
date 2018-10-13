@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
 using VueTodoApi.Configuration;
 
 namespace VueTodoApi
@@ -36,6 +37,12 @@ namespace VueTodoApi
                         return Task.CompletedTask;
                     };
                 });
+
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
+            });
 
             services.AddMvc();
         }

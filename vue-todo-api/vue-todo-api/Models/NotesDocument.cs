@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace VueTodoApi.Models
 {
@@ -11,6 +12,7 @@ namespace VueTodoApi.Models
         public string More { get; set; }
         public string Type { get; set; }
         public string Image { get; set; }
+        public List<string> Images { get; set; }
         public DateTime TimeOfEntry { get; set; }
     }
 }

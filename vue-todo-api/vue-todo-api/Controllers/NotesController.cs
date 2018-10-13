@@ -33,7 +33,7 @@ namespace VueTodoApi.Controllers
 
         [Authorize]
         [HttpPost]
-        public IActionResult Post([FromBody]NotesDocument note, string password)
+        public IActionResult Post([FromBody]NotesDocument note)
         {
             if (!string.IsNullOrEmpty(note.Id)) return BadRequest("Note Id is already populated");
 
@@ -42,13 +42,13 @@ namespace VueTodoApi.Controllers
             {
                 session.Store(note);
                 session.SaveChanges();
+                return Ok(new { id = note.Id});
             }
-            return Ok();
         }
 
         [Authorize]
         [HttpPut]
-        public IActionResult Put([FromBody]NotesDocument note, string password)
+        public IActionResult Put([FromBody]NotesDocument note)
         {
             if (string.IsNullOrEmpty(note.Id)) return BadRequest("Note does not have an Id");
 
@@ -57,13 +57,13 @@ namespace VueTodoApi.Controllers
             {
                 session.Store(note);
                 session.SaveChanges();
+                return Ok(new { id = note.Id});
             }
-            return Ok();
         }
 
         [Authorize]
         [HttpDelete]
-        public IActionResult Delete(string id, string password)
+        public IActionResult Delete(string id)
         {
             using (var session = _store.OpenSession())
             {
