@@ -30,7 +30,7 @@ namespace VueTodoApi.Controllers
         {
             using (var session = _store.OpenSession())
             {
-                var res = session.Advanced.Attachments.Get($"Notes/${noteId}",$"${imageName}");
+                var res = session.Advanced.Attachments.Get(noteId, imageName);
                 if (res == null) return NotFound();
                 return File(res.Stream, "image/jpeg"); 
             }
@@ -56,13 +56,12 @@ namespace VueTodoApi.Controllers
                     if(!note.Images.Contains(imageName)) note.Images.Add(imageName);
                     await session.StoreAsync(note);
                     stream.Seek(0, 0);
-                    session.Advanced.Attachments.Store($"NotesDocuments/{noteId}", imageName, stream, "image/jpeg");
+                    session.Advanced.Attachments.Store(noteId, imageName, stream, "image/jpeg");
                     await session.SaveChangesAsync();
                     return Ok(new {imageName});
                 }
             }
             return BadRequest();
         }
-        
     }
 }

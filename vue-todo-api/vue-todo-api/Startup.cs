@@ -28,6 +28,10 @@ namespace VueTodoApi
 
             var ravenConfig = Configuration.GetSection("RavenDbSettings").Get<RavenDbSettings>();
             services.AddSingleton(RavenDbConfiguration.Configure(ravenConfig));
+            
+            var filesConfig = Configuration.GetSection("FileSettings").Get<FilesSettings>();
+            services.AddSingleton(filesConfig);
+
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => {
@@ -37,12 +41,6 @@ namespace VueTodoApi
                         return Task.CompletedTask;
                     };
                 });
-
-            services.Configure<FormOptions>(x =>
-            {
-                x.ValueLengthLimit = int.MaxValue;
-                x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
-            });
 
             services.AddMvc();
         }
