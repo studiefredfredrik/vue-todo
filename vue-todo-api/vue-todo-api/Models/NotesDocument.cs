@@ -13,6 +13,7 @@ namespace VueTodoApi.Models
         public string Type { get; set; }
         public string Image { get; set; }
         public List<string> Images { get; set; }
+        public List<string> Files { get; set; }
         public DateTime TimeOfEntry { get; set; }
     }
 }

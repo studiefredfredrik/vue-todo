@@ -19,7 +19,7 @@ namespace VueTodoApi.Configuration
             
             try {
                 documentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(documentStore.Database)));
-            } catch(Exception e) {
+            } catch(Exception) {
                 // database exists
             }
 
