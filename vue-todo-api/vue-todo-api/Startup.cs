@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Features;
 using VueTodoApi.Configuration;
 
 namespace VueTodoApi
@@ -30,8 +26,8 @@ namespace VueTodoApi
             services.AddSingleton(RavenDbConfiguration.Configure(ravenConfig));
             
             var filesConfig = Configuration.GetSection("FileSettings").Get<FilesSettings>();
+//            if(string.IsNullOrWhiteSpace(filesConfig.Path)) filesConfig.Path = hostingEnvironment.WebRootPath;
             services.AddSingleton(filesConfig);
-
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => {

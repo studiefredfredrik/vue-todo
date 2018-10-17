@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
-using VueTodoApi.Configuration;
+using Raven.Client.Documents.Linq;
 using VueTodoApi.Models;
 
 namespace VueTodoApi.Controllers
@@ -20,14 +19,29 @@ namespace VueTodoApi.Controllers
         }
 
         [HttpGet]
-        public List<NotesDocument> Get()
+        public IActionResult Get(int pageSize, int pageNumber, string tag = null)
+        {
+            if (pageSize > 100) return Forbid();
+            var noFilter = string.IsNullOrWhiteSpace(tag);
+            using (var session = _store.OpenSession())
+            {
+                var res = session.Query<NotesDocument>()
+                    .Where(note => tag.In(note.Tags))
+                    .Skip(pageNumber*pageSize)
+                    .Take(pageSize)
+                    .OrderByDescending(doc => doc.TimeOfEntry)
+                    .ToList();
+
+                return Ok(res);
+            }
+        }
+        
+        [HttpGet("count")]
+        public int GetCount()
         {
             using (var session = _store.OpenSession())
             {
-                return session.Query<NotesDocument>()
-                    .Take(100)
-                    .OrderByDescending(doc => doc.TimeOfEntry)
-                    .ToList();
+                return session.Query<NotesDocument>().Count();
             }
         }
 

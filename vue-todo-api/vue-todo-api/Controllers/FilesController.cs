@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Raven.Client.Documents;
@@ -12,11 +13,12 @@ namespace VueTodoApi.Controllers
     [Route("api/[controller]")]
     public class FilesController : Controller
     {
-        private readonly FilesSettings _filesSettings;
+        private static string filesPath;
         
-        public FilesController(FilesSettings filesSettings, IDocumentStore store)
+        public FilesController(FilesSettings filesSettings, IDocumentStore store, IHostingEnvironment hostingEnvironment)
         {
-            _filesSettings = filesSettings;
+            if (!string.IsNullOrWhiteSpace(filesSettings.Path)) filesPath = filesSettings.Path;
+            else filesPath = hostingEnvironment.WebRootPath;
         }
 
         [DisableRequestSizeLimit]
@@ -24,7 +26,7 @@ namespace VueTodoApi.Controllers
         [HttpGet("{folder}/{fileName}")]
         public IActionResult GetFile(string folder, string fileName)
         {
-            var path = $"{_filesSettings.Path}/{folder}/{fileName}";
+            var path = $"{filesPath}/{folder}/{fileName}";
 
             if (path.Contains("..")) return Forbid();
             if (!System.IO.File.Exists(path)) return NotFound();
@@ -41,7 +43,7 @@ namespace VueTodoApi.Controllers
         {
             if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName)) return BadRequest();
             
-            var path = $"{_filesSettings.Path}/{folder}/{fileName}";
+            var path = $"{filesPath}/{folder}/{fileName}";
 
             if (path.Contains("..")) return Forbid();
 
