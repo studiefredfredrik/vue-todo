@@ -7,29 +7,28 @@
         </div>
 
         <div class="w3-container">
-          <input type="text" v-if="page.heading.editing" v-on:blur="page.heading.editing = false;" v-model="page.heading.text"/>
-          <h3><b v-if="!page.heading.editing" v-on:click="page.heading.editing = true;">{{page.heading.text}}</b></h3>
+          <input type="text" v-if="page.heading.editing" v-on:blur="page.heading.editing = false" v-model="page.heading.text"/>
+          <h3><b v-if="!page.heading.editing" v-on:click="page.heading.editing = true">{{page.heading.text}}</b></h3>
         </div>
 
         <div class="w3-container">
-          <input type="text" v-if="page.undertitle.editing" v-on:blur="page.undertitle.editing = false;" v-model="page.undertitle.text"/>
-          <h3><b v-if="!page.undertitle.editing" v-on:click="page.undertitle.editing = true;">{{page.undertitle.text}}</b></h3>
+          <input type="text" v-if="page.undertitle.editing" v-on:blur="page.undertitle.editing = false" v-model="page.undertitle.text"/>
+          <h3><b v-if="!page.undertitle.editing" v-on:click="page.undertitle.editing = true">{{page.undertitle.text}}</b></h3>
         </div>
 
 
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
-          <img v-show="!sidebar.image.editing && sidebar.image.image" v-bind:src="sidebar.image.image" style="width:100%" v-on:click="sidebar.image.editing = true;">
           <croppa v-show="sidebar.image.editing"
                   v-model="sidebar.image.myCroppa"
                   :width="700"
                   :height="220"
-                  :initial-image="sidebar.image.image"
+                  initial-image="/api/Files/frontpage/description-image.jpg"
           ></croppa>
 
           <div class="w3-container" id="text">
-            <textarea type="text" rows="10" class="widt100" v-if="sidebar.description.editing" v-on:blur="sidebar.description.editing = false;" v-model="sidebar.description.text"></textarea>
-            <p id="description" v-if="!sidebar.description.editing" v-on:click="sidebar.description.editing = true;">
+            <textarea type="text" rows="10" class="widt100" v-if="sidebar.description.editing" v-on:blur="sidebar.description.editing = false" v-model="sidebar.description.text"></textarea>
+            <p id="description" v-if="!sidebar.description.editing" v-on:click="sidebar.description.editing = true">
               <vue-markdown v-if="sidebar.description.text">{{sidebar.description.text}}</vue-markdown>
             </p>
           </div>
@@ -49,7 +48,7 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  import axios from 'axios'
   import VueMarkdown from 'vue-markdown'
   import toaster from '@/components/ToasterModule'
 
@@ -83,7 +82,6 @@
     props: ['frontpage'],
     methods: {
       handleNewImage: function(){
-        this.sidebar.image.image = this.sidebar.image.myCroppa.generateDataUrl()
         this.sidebar.image.editing = false
       },
       backdropClick: function(e){
@@ -100,24 +98,40 @@
         }
       },
       save: function(){
+        this.uploadCroppedImage()
         let post = {
           heading : this.page.heading.text,
           undertitle: this.page.undertitle.text,
           sidebar: {
-            image: this.sidebar.image.myCroppa.generateDataUrl() || this.sidebar.image.image,
             description: this.sidebar.description.text
           }
         }
         axios.put(`/api/Frontpage`, post)
           .then(response => {
-            this.$emit('close', true);
+            this.$emit('close', true)
           })
           .catch(e => {
             toaster.show('An error occurred saving the post on the server')
         })
       },
       close(e) {
-        this.$emit('close', false);
+        this.$emit('close', false)
+      },
+      uploadCroppedImage() {
+        this.sidebar.image.myCroppa.generateBlob(
+          blob => {
+            let formData = new FormData()
+            formData.append('files[0]', blob)
+            axios.post(`/api/Files/?folder=frontpage&fileName=description-image.jpg&overwrite=true`, formData, {headers: {'Content-Type': `multipart/form-data boundary=${formData.boundary}`}})
+              .then(response => {
+              })
+              .catch(e => {
+                toaster.show('An error occurred saving the post on the server')
+              })
+          },
+          'image/jpeg',
+          0.8 // compression
+        )
       },
     },
     mounted(){
