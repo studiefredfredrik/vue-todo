@@ -7,7 +7,7 @@
         </div>
 
         <div class="w3-card-4 w3-margin w3-white">
-          <img v-bind:src="post.image" style="width:100%">
+          <img v-bind:src="getImageUrl(header.jpg)" style="width:100%">
           <div class="w3-container">
             <h3><b>{{post.heading}}</b></h3>
           </div>
@@ -36,6 +36,9 @@
     name: 'viewpostmodal',
     props: ['post'],
     methods: {
+      getImageUrl(imageName){
+        return `/api/Files/${this.id}/${imageName}`
+      },
       backdropClick: function(e){
         if(e.target.id === 'backdrop')
           this.$emit('close')

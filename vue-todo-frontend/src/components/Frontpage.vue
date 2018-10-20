@@ -22,7 +22,7 @@
         <div class="w3-col l8 s12">
 
           <div class="w3-card-4 w3-margin w3-white" v-for="(post, index) in posts">
-            <img v-bind:src="getImageUrl(post.Id)" alt="Nature" style="width:100%">
+            <img :src="getImageUrl(post.id)" style="width:100%">
             <div class="w3-container">
               <h3><b>{{post.heading}}</b></h3>
             </div>
@@ -46,7 +46,7 @@
         <div class="w3-col l4">
           <!-- About Card -->
           <div class="w3-card w3-margin w3-margin-top" @click="showFrontpageModal()">
-            <img v-bind:src="sidebar.image"  style="width:100%">
+            <img src="/api/Files/frontpage/description-image.jpg"  style="width:100%">
             <div class="w3-container w3-white">
               <p v-if="sidebar.description">
                 <vue-markdown>{{sidebar.description}}</vue-markdown>
@@ -90,28 +90,12 @@
               <h4>Tags</h4>
             </div>
             <div class="w3-container w3-white">
-              <p><span class="w3-tag w3-black w3-margin-bottom">Travel</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">New York</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">London</span>
-                <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">IKEA</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">NORWAY</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">DIY</span>
-                <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Ideas</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Baby</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Family</span>
-                <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">News</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Clothing</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Shopping</span>
-                <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Sports</span> <span class="w3-tag w3-light-grey w3-small w3-margin-bottom">Games</span>
+              <p>
+                <span class="w3-tag w3-black w3-margin-bottom" >Travel</span>
+                <span class="w3-tag w3-light-grey w3-small w3-margin-bottom" v-bind:class="{ 'w3-black': activeTag == tag }" v-for="(tag, index) in tags">{{}}</span>
               </p>
             </div>
           </div>
-
-
-            <ul v-if="posts && posts.length">
-              <li v-for="post of posts">
-                <p><strong>{{post.title}}</strong></p>
-                <p>{{post.body}}</p>
-              </li>
-            </ul>
-
-            <ul v-if="errors && errors.length">
-              <li v-for="error of errors">
-                {{error.message}}
-              </li>
-            </ul>
 
           <!-- END Introduction Menu -->
         </div>
@@ -122,7 +106,14 @@
       <!-- END w3-content -->
     </div>
 
-    <a href="/api/login" class="loginlink">Go to login</a>
+    <!--<a href="/api/login" class="loginlink">Go to login</a>-->
+
+    <!-- Footer -->
+    <footer v-if="getNumberOfPages() > 1">
+      <a class="left-button" @click="goToPage(currentPage-1)" v-if="currentPage > 0"><<</a>
+      <a class="page-number" @click="goToPage(index)" v-bind:class="{'active-page': currentPage+1 === index}" v-for="index in getNumberOfPages()">{{index}}</a>
+      <a class="right-button" @click="goToPage(currentPage+1)" v-if="currentPage < getNumberOfPages()">>></a>
+    </footer>
 
   </div>
 
@@ -144,23 +135,40 @@
     name: 'Frontpage',
     data: function () {
       return {
-        isModalVisible: false,
-        isModalVisible2: false,
-        msg: 'Welcome to Your Vue.js App',
         posts: [],
+        tags: [],
+        activeTag: '',
         errors: [],
         frontpage: {},
         sidebar: {},
-        loggedIn: false
+        loggedIn: false,
+        currentPage: 0,
+        pageSize: 10,
+        notesCount: 0,
+        cacheBustId: null
       }
     },
     methods: {
-      getSidebarImage(){
-        if(this.page.sidebar)
-          return this.page.sidebar.image
+      tagClick(){
+        this.currentPage = 0
+        if(this.activeTag !== '') this.activeTag = ''
+        this.getPosts()
+      },
+      getNumberOfPages(){
+        return Math.floor(this.notesCount / this.pageSize) + 1
       },
       getImageUrl(noteId){
-        return `/api/Image/?noteId=${noteId}&imageName=header`
+        let cacheBustHash = ''
+        if (this.cacheBustId === noteId) {
+          this.cacheBustId = null
+          cacheBustHash = `?${Date.now()}`
+        }
+        return `/api/Files/${noteId}/header.jpg${cacheBustHash}`
+
+      },
+      goToPage(pageNumber){
+        this.currentPage = pageNumber-1
+        this.getPosts()
       },
       showModal(post) {
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
@@ -170,11 +178,13 @@
         })
         instance.$mount() // pass nothing
         this.$refs.container.appendChild(instance.$el)
-        instance.$on('close', function(refresh){
+        instance.$on('close', function(refresh, postId){
           instance.$el.remove()
           instance.$destroy()
           if(refresh){
-            this.getPosts()
+            this.cacheBustId = postId
+            this.getPosts(this.currentPage)
+            this.getNoteCount()
           }
         }.bind(this))
       },
@@ -195,7 +205,7 @@
         }.bind(this))
       },
       getPosts: function () {
-        axios.get(`/api/Notes`)
+        axios.get(`/api/Notes?pageSize=${this.pageSize}&pageNumber=${this.currentPage}&tag=${this.activeTag}`)
           .then(response => {
             // JSON responses are automatically parsed.
             this.posts = response.data
@@ -215,11 +225,22 @@
             toaster.show('An error occurred getting the posts from the server')
           })
       },
+      getNoteCount: function () {
+        axios.get(`/api/Notes/count`)
+          .then(response => {
+            // JSON responses are automatically parsed.
+            this.notesCount = response.data
+          })
+          .catch(e => {
+            toaster.show('An error occurred getting the posts from the server')
+          })
+      },
     },
     mounted(){
       if(document.cookie.indexOf('user=') > -1){
         this.loggedIn = true
       }
+      this.getNoteCount()
     },
     // Fetches posts when the component is created.
     created() {
@@ -253,4 +274,26 @@
     float: right;
     margin: 18px;
   }
+
+  .left-button{
+
+  }
+
+  .page-number{
+    margin: 10px;
+    cursor: pointer;
+  }
+
+  .right-button{
+
+  }
+
+  .active-page{
+    text-decoration: underline;
+  }
+
+  footer{
+    text-align: center;
+  }
+
 </style>

@@ -7,26 +7,26 @@
         </div>
 
         <!-- Blog entry -->
-        <div class="w3-card-4 w3-margin w3-white">
-          <!--<img v-show="!image.editing && image.image" v-bind:src="getImageUrl('header')" style="width:100%" v-on:click="image.editing = true;">-->
-          <croppa v-model="image.myCroppa"
+        <div class="w3-card-4 w3-margin w3-white post-container">
+          <croppa v-if="propsLoaded"
+                  v-model="image.myCroppa"
                   :width="700"
                   :height="220"
-                  :initial-image="getImageUrl('header')"
+                  :initial-image="getImageUrl('header.jpg')"
           ></croppa>
           <div class="w3-container">
-            <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false;" v-model="heading.text"/>
-            <h3><b v-if="!heading.editing" v-on:click="heading.editing = true;">{{heading.text}}</b></h3>
+            <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false" v-model="heading.text"/>
+            <h3><b v-if="!heading.editing" v-on:click="heading.editing = true">{{heading.text}}</b></h3>
           </div>
 
           <div class="w3-container" id="text">
-            <textarea type="text" rows="10" class="widt100" v-if="description.editing" v-on:blur="description.editing = false;" v-model="description.text"></textarea>
-            <p id="description" v-if="!description.editing" v-on:click="description.editing = true;">
+            <textarea type="text" rows="10" class="widt100" v-if="description.editing" v-on:blur="description.editing = false" v-model="description.text" tabindex="1"></textarea>
+            <p id="description" v-if="!description.editing" v-on:click="description.editing = true">
               <vue-markdown>{{description.text}}</vue-markdown>
             </p>
 
-            <textarea class="widt100" rows="10" type="text" v-if="more.editing" v-on:blur="more.editing = false;" v-model="more.text"></textarea>
-            <p v-if="!more.editing" v-on:click="more.editing = true;">
+            <textarea class="widt100" rows="10" type="text" v-if="more.editing" v-on:blur="more.editing = false" v-model="more.text" tabindex="2"></textarea>
+            <p v-if="!more.editing" v-on:click="more.editing = true">
               <vue-markdown>{{more.text}}</vue-markdown>
             </p>
             <br>
@@ -35,10 +35,10 @@
           <div class="w3-container">
             <div class="w3-row">
               <div class="w3-col m2 s1">
-                <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()"><b>Save</b></button></p>
+                <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()" tabindex="3"><b>Save</b></button></p>
               </div>
               <div class="w3-col m4 s6">
-                <p><button class="w3-button w3-padding-large w3-white w3-border" @click="deletePost()"><b>Delete</b></button></p>
+                <p><button class="w3-button w3-padding-large w3-white w3-border" @click="deletePost()" tabindex="4"><b>Delete</b></button></p>
               </div>
             </div>
           </div>
@@ -79,15 +79,12 @@
           text: `Even more info here, with more details etc. And more more more`,
           editing: false,
         },
-        id: ''
+        id: '',
+        propsLoaded : false,
       }
     },
     props: ['post'],
     methods: {
-      handleNewImage: function(){
-        // this.uploadCroppedImage('header')
-        this.image.editing = false
-      },
       backdropClick: function(e){
         if(e.target.id === 'backdrop')
           this.$emit('close')
@@ -100,7 +97,7 @@
           this.more.editing = false
         }
       },
-      savePost: function(){
+      savePost: async function(){
 
         let post = {
           heading: this.heading.text,
@@ -110,18 +107,18 @@
           type: 'equipment'
         }
         if(this.id){
-          this.uploadCroppedImage(this.id, 'header')
+          await this.uploadCroppedImage(this.id, 'header', true)
           axios.put(`/api/Notes`, post)
             .then(response => {
-              this.$emit('close', true);
+              this.$emit('close', true, post.id);
             })
             .catch(e => {
               toaster.show('An error occurred saving the post on the server')
             })
         } else{
           axios.post(`/api/Notes`, post)
-            .then(response => {
-              this.uploadCroppedImage(response.data.id, 'header')
+            .then(async response => {
+              await this.uploadCroppedImage(response.data.id, 'header', false)
               this.$emit('close', true);
             })
             .catch(e => {
@@ -142,25 +139,19 @@
         this.$emit('close', false);
       },
       getImageUrl(imageName){
-        return `/api/Image?noteId=${this.id}&imageName=${imageName}`
+        return `/api/Files/${this.id}/${imageName}`
       },
-      uploadCroppedImage(noteId, imageName) {
-        this.image.myCroppa.generateBlob(
-          blob => {
+      async uploadCroppedImage(noteId, imageName, overwrite) {
+        await this.image.myCroppa.generateBlob(
+          async blob => {
             let formData = new FormData();
             formData.append('files[0]', blob);
-            axios.post(`/api/Image/?noteId=${noteId}&imageName=${imageName}`, formData, {headers: {'Content-Type': `multipart/form-data; boundary=${formData.boundary}`}})
-              .then(response => {
-                toaster.show(`Image saved as ${response.data.guid}`)
-              })
-              .catch(e => {
-                toaster.show('An error occurred saving the post on the server')
-              })
+            await axios.post(`/api/Files/?folder=${noteId}&fileName=${imageName}.jpg&overwrite=${overwrite ? 'true' : 'false'}`, formData, {headers: {'Content-Type': `multipart/form-data; boundary=${formData.boundary}`}})
           },
           'image/jpeg',
-          0.8
-        ); // 80% compressed jpeg file
-      }
+          0.8 // compression
+        );
+      },
     },
     mounted(){
       if(this.post){
@@ -171,6 +162,7 @@
         if(!this.post.image) this.image.editing = true;
         this.id = this.post.id
       }
+      this.propsLoaded = true;
     },
     components: {
       VueMarkdown
@@ -221,6 +213,10 @@
     overflow-x: auto;
     display: flex;
     flex-direction: column;
+  }
+  
+  .post-container{
+    overflow: hidden;
   }
 
 </style>
