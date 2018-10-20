@@ -52,6 +52,9 @@ namespace VueTodoApi.Controllers
                 if(overwrite) System.IO.File.Delete(path);
                 else return Forbid();
             }
+
+            if (!Directory.Exists($"{filesPath}/{folder}"))
+                Directory.CreateDirectory($"{filesPath}/{folder}");
             
             var file = Request.Form.Files[0];
             var size = file.Length;

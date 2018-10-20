@@ -26,10 +26,10 @@ namespace VueTodoApi.Controllers
             using (var session = _store.OpenSession())
             {
                 var res = session.Query<NotesDocument>()
-                    .Where(note => tag.In(note.Tags))
+                    .Where(note => note.Tags.Any(t => t == tag))
+                    .OrderByDescending(doc => doc.TimeOfEntry)
                     .Skip(pageNumber*pageSize)
                     .Take(pageSize)
-                    .OrderByDescending(doc => doc.TimeOfEntry)
                     .ToList();
 
                 return Ok(res);
@@ -66,7 +66,6 @@ namespace VueTodoApi.Controllers
         {
             if (string.IsNullOrEmpty(note.Id)) return BadRequest("Note does not have an Id");
 
-            note.TimeOfEntry = DateTime.Now;
             using (var session = _store.OpenSession())
             {
                 session.Store(note);
