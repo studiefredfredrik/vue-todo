@@ -26,7 +26,6 @@ namespace VueTodoApi
             services.AddSingleton(RavenDbConfiguration.Configure(ravenConfig));
             
             var filesConfig = Configuration.GetSection("FileSettings").Get<FilesSettings>();
-//            if(string.IsNullOrWhiteSpace(filesConfig.Path)) filesConfig.Path = hostingEnvironment.WebRootPath;
             services.AddSingleton(filesConfig);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

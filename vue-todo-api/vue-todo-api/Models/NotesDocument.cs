@@ -16,5 +16,7 @@ namespace VueTodoApi.Models
         public List<string> Files { get; set; }
         public List<string> Tags { get; set; }
         public DateTime TimeOfEntry { get; set; }
+        public int Views { get; set; }
+        
     }
 }

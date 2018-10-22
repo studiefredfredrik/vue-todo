@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VueTodoApi.Models;
 using Raven.Client.Documents;
@@ -24,7 +23,7 @@ namespace VueTodoApi.Controllers
         {
             using (var session = _store.OpenSession())
             {
-                var doc = session.Query<StatisticsDocument>()
+                var doc = session.Query<NotesDocument>()
                                  .OrderBy(stats => stats.Views)
                                  .Take(4)
                                  .ToList();
@@ -34,13 +33,13 @@ namespace VueTodoApi.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> NoteViewed(string noteId)
+        public IActionResult NoteViewed(string noteId)
         {
+            if (string.IsNullOrWhiteSpace(noteId)) return Forbid();
             using (var session = _store.OpenSession())
             {
-                var doc = await session.Query<StatisticsDocument>()
-                              .FirstOrDefaultAsync(note => note.Id == noteId) 
-                                ?? new StatisticsDocument {Id = noteId, Views = 0};
+                var doc = session.Load<NotesDocument>(noteId);
+                if (doc == null) return NotFound();
                 doc.Views++;
                 session.Store(doc);
                 session.SaveChanges();
