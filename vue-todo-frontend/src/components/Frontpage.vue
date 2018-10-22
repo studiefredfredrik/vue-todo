@@ -171,6 +171,7 @@
         this.getPosts()
       },
       showModal(post) {
+        axios.post(`/api/Statistics?noteId=${post.id}`)
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
         let ComponentClass = Vue.extend(modal)
         let instance = new ComponentClass({
@@ -240,12 +241,12 @@
       if(document.cookie.indexOf('user=') > -1){
         this.loggedIn = true
       }
-      this.getNoteCount()
     },
     // Fetches posts when the component is created.
     created() {
       this.getPage()
       this.getPosts()
+      this.getNoteCount()
     },
     components: {
       VueMarkdown,
