@@ -32,6 +32,16 @@
             <br>
           </div>
 
+          <!-- tags -->
+          <div class="w3-container">
+            <input type="text" v-if="tags.editing" v-on:blur="tagsEditingChanged(false)" v-model="tags.tagsString"/>
+          </div>
+            <div class="w3-container w3-white" v-if="!tags.editing" v-on:click="tagsEditingChanged(true)">
+              <p>
+                <span class="tags-desc">Tagged with:</span>  <span class="w3-tag 3-light-grey w3-small w3-margin" v-for="(tag, index) in tags.tags">{{tag}}</span>
+              </p>
+            </div>
+
           <div class="w3-container">
             <div class="w3-row">
               <div class="w3-col m2 s1">
@@ -81,6 +91,11 @@
         },
         id: '',
         propsLoaded : false,
+        tags:{
+          editing: false,
+          tags: [],
+          tagsString : ''
+        }
       }
     },
     props: ['post'],
@@ -104,8 +119,10 @@
           description: this.description.text,
           more: this.more.text,
           id: this.id,
-          type: 'equipment'
+          type: 'equipment',
+          tags: this.tags.tagsString.split(',')
         }
+        this.postTags()
         if(this.id){
           await this.uploadCroppedImage(this.id, 'header', true)
           axios.put(`/api/Notes`, post)
@@ -141,6 +158,10 @@
       getImageUrl(imageName){
         return `/api/Files/${this.id}/${imageName}`
       },
+      tagsEditingChanged(nextState){
+        this.tags.editing = nextState
+        this.tags.tags = this.tags.tagsString.split(',') || []
+      },
       async uploadCroppedImage(noteId, imageName, overwrite) {
         await this.image.myCroppa.generateBlob(
           async blob => {
@@ -152,6 +173,9 @@
           0.8 // compression
         );
       },
+      postTags(){
+        axios.post(`/api/Tags/?tags=${this.tagsString}`)
+      }
     },
     mounted(){
       if(this.post){
@@ -161,6 +185,8 @@
         this.image.image = this.post.image
         if(!this.post.image) this.image.editing = true;
         this.id = this.post.id
+        this.tags.tags = this.post.tags || []
+        this.tags.tagsString = this.tags.tags.join(',')
       }
       this.propsLoaded = true;
     },
@@ -217,6 +243,11 @@
   
   .post-container{
     overflow: hidden;
+  }
+
+  .tags-desc{
+    font-style: italic;
+    font-size: 12px;
   }
 
 </style>

@@ -24,6 +24,13 @@
           </div>
 
         </div>
+
+        <div class="w3-container w3-white">
+          <p>
+            <span class="tags-desc">Tagged with:</span>  <span class="w3-tag 3-light-grey w3-small w3-margin" v-for="(tag, index) in post.tags">{{tag}}</span>
+          </p>
+        </div>
+
       </div>
     </div>
   </transition>
@@ -93,5 +100,10 @@
     display: flex;
     flex-direction: column;
   }
+  .tags-desc{
+    font-style: italic;
+    font-size: 12px;
+  }
+
 
 </style>

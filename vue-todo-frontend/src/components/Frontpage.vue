@@ -85,13 +85,12 @@
           <hr>
 
           <!-- Labels / tags -->
-          <div class="w3-card w3-margin">
+          <div class="w3-card w3-margin" v-if="tags.length > 0">
             <div class="w3-container w3-padding">
               <h4>Tags</h4>
             </div>
             <div class="w3-container w3-white">
               <p>
-                <span class="w3-tag w3-black w3-margin-bottom" >Travel</span>
                 <span class="w3-tag w3-light-grey w3-small w3-margin-bottom" v-bind:class="{ 'w3-black': activeTag == tag }" v-for="(tag, index) in tags">{{}}</span>
               </p>
             </div>
@@ -236,6 +235,26 @@
             toaster.show('An error occurred getting the posts from the server')
           })
       },
+      getMostViewedPosts: function () {
+        axios.get(`/api/Notes/count`)
+          .then(response => {
+            // JSON responses are automatically parsed.
+            this.notesCount = response.data
+          })
+          .catch(e => {
+            toaster.show('An error occurred getting the posts from the server')
+          })
+      },
+      getTags: function () {
+        axios.get(`/api/Tags`)
+          .then(response => {
+            // JSON responses are automatically parsed.
+            this.tags = response.data.tags
+          })
+          .catch(e => {
+            toaster.show('An error occurred getting the posts from the server')
+          })
+      }
     },
     mounted(){
       if(document.cookie.indexOf('user=') > -1){
@@ -244,9 +263,13 @@
     },
     // Fetches posts when the component is created.
     created() {
+      this.activeTag = this.$route.query.tag || ''
+      this.currentPage = this.$route.query.page || 0
       this.getPage()
       this.getPosts()
       this.getNoteCount()
+      this.getTags()
+      this.getMostViewedPosts()
     },
     components: {
       VueMarkdown,
