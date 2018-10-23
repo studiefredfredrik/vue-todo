@@ -171,7 +171,7 @@
         this.getPosts()
       },
       showModal(post) {
-        axios.post(`/api/Statistics?noteId=${post.id}`)
+        if(post) axios.post(`/api/Statistics?noteId=${post.id}`)
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
         let ComponentClass = Vue.extend(modal)
         let instance = new ComponentClass({

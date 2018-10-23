@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
@@ -22,19 +24,32 @@ namespace VueTodoApi.Controllers
         public IActionResult Get(int pageSize, int pageNumber, string tag = null)
         {
             if (pageSize > 100) return Forbid();
-            var noFilter = string.IsNullOrWhiteSpace(tag);
+            var tagFilter = !string.IsNullOrWhiteSpace(tag);
             using (var session = _store.OpenSession())
             {
-                var res = session.Query<NotesDocument>()
-                    .Where(note => note.Tags.Any(t => t == tag))
-                    .OrderByDescending(doc => doc.TimeOfEntry)
-                    .Skip(pageNumber*pageSize)
-                    .Take(pageSize)
-                    .ToList();
-
+                var res = new List<NotesDocument>();
+                if (tagFilter)
+                {
+                    res = session.Query<NotesDocument>()
+                        .Where(note => note.Tags != null && note.Tags.Any(t => t == tag))
+                        .OrderByDescending(doc => doc.TimeOfEntry)
+                        .Skip(pageNumber * pageSize)
+                        .Take(pageSize)
+                        .ToList();
+                }
+                else
+                {
+                    res = session.Query<NotesDocument>()
+                        .OrderByDescending(doc => doc.TimeOfEntry)
+                        .Skip(pageNumber * pageSize)
+                        .Take(pageSize)
+                        .ToList();    
+                }
+                
                 return Ok(res);
             }
         }
+        
         
         [HttpGet("count")]
         public int GetCount()
