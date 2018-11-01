@@ -18,15 +18,15 @@ namespace VueTodoApi.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("top4")]
         public IActionResult GetTop4()
         {
             using (var session = _store.OpenSession())
             {
                 var doc = session.Query<NotesDocument>()
-                                 .OrderBy(stats => stats.Views)
-                                 .Take(4)
-                                 .ToList();
+                     .OrderByDescending(stats => stats.Views)
+                     .Take(4)
+                     .ToList();
                               
                 return Ok(doc);
             }
