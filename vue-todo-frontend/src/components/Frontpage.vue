@@ -59,26 +59,12 @@
             <div class="w3-container w3-padding">
               <h4>Popular Posts</h4>
             </div>
-            <ul class="w3-ul w3-hoverable w3-white">
+            <ul class="w3-ul w3-hoverable w3-white" v-for="doc in top4" @click="showModal(doc)">
               <li class="w3-padding-16">
-                <img src="/w3images/workshop.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px">
-                <span class="w3-large">Lorem</span><br>
-                <span>Sed mattis nunc</span>
-              </li>
-              <li class="w3-padding-16">
-                <img src="/w3images/gondol.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px">
-                <span class="w3-large">Ipsum</span><br>
-                <span>Praes tinci sed</span>
-              </li>
-              <li class="w3-padding-16">
-                <img src="/w3images/skies.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px">
-                <span class="w3-large">Dorum</span><br>
-                <span>Ultricies congue</span>
-              </li>
-              <li class="w3-padding-16 w3-hide-medium w3-hide-small">
-                <img src="/w3images/rock.jpg" alt="Image" class="w3-left w3-margin-right" style="width:50px">
-                <span class="w3-large">Mingsum</span><br>
-                <span>Lorem ipsum dipsum</span>
+                <img :src="getImageUrl(doc.id)" alt="Image" class="w3-left w3-margin-right" style="width:50px">
+                <span class="w3-large">{{doc.heading}}</span><br>
+                <span>{{doc.more.length > 120 ? doc.more.substring(0, 120) + '...' : doc.more}}</span>
+                <span class="views-counter">{{doc.views}}</span>
               </li>
             </ul>
           </div>
@@ -148,7 +134,8 @@
         currentPage: 0,
         pageSize: 10,
         notesCount: 0,
-        cacheBustId: null
+        cacheBustId: null,
+        top4: []
       }
     },
     methods: {
@@ -258,6 +245,15 @@
           .catch(e => {
             toaster.show('An error occurred getting the posts from the server')
           })
+      },
+      getTop4: function () {
+        axios.get(`/api/Statistics/top4`)
+          .then(response => {
+            this.top4 = response.data
+          })
+          .catch(e => {
+            toaster.show('An error occurred getting the posts from the server')
+          })
       }
     },
     mounted(){
@@ -274,6 +270,7 @@
       this.getNoteCount()
       this.getTags()
       this.getMostViewedPosts()
+      this.getTop4()
     },
     components: {
       VueMarkdown,
@@ -320,8 +317,13 @@
     text-decoration: underline;
   }
 
-  .active-tag{
-
+  .views-counter{
+    float: right;
+    font-size: 8px;
+    font-style: italic;
+    padding: 4px;
+    border-radius: 5px;
+    background: #f1f1f1;
   }
 
   footer{
