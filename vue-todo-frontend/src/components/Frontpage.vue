@@ -91,7 +91,11 @@
             </div>
             <div class="w3-container w3-white">
               <p>
-                <span class="w3-tag w3-light-grey w3-small w3-margin-bottom" v-bind:class="{ 'w3-black': activeTag == tag }" v-for="(tag, index) in tags">{{}}</span>
+                <span class="w3-tag w3-small w3-margin-bottom w3-margin"
+                      @click="setActiveTag(tag)"
+                      v-bind:class="[activeTag === tag.tag ? 'w3-black w3-padding' : 'w3-light-grey']"
+                      v-for="(tag, index) in tags">{{tag.tag}}
+                </span>
               </p>
             </div>
           </div>
@@ -148,9 +152,12 @@
       }
     },
     methods: {
-      tagClick(){
+      setActiveTag(tag){
         this.currentPage = 0
-        if(this.activeTag !== '') this.activeTag = ''
+        if(this.activeTag == tag.tag) this.activeTag = ''
+        else this.activeTag = tag.tag
+        //this.$route.query.tag = this.activeTag
+        this.$router.push({ query: { tag: this.activeTag }})
         this.getPosts()
       },
       getNumberOfPages(){
@@ -167,6 +174,8 @@
       },
       goToPage(pageNumber){
         this.currentPage = pageNumber-1
+        this.$router.push({ query: { page: this.currentPage }})
+        // this.$route.query.page = this.currentPage
         this.getPosts()
       },
       showModal(post) {
@@ -207,7 +216,6 @@
       getPosts: function () {
         axios.get(`/api/Notes?pageSize=${this.pageSize}&pageNumber=${this.currentPage}&tag=${this.activeTag}`)
           .then(response => {
-            // JSON responses are automatically parsed.
             this.posts = response.data
           })
           .catch(e => {
@@ -217,7 +225,6 @@
       getPage: function () {
         axios.get(`/api/Frontpage`)
           .then(response => {
-            // JSON responses are automatically parsed.
             this.frontpage = response.data
             this.sidebar = response.data.sidebar
           })
@@ -228,7 +235,6 @@
       getNoteCount: function () {
         axios.get(`/api/Notes/count`)
           .then(response => {
-            // JSON responses are automatically parsed.
             this.notesCount = response.data
           })
           .catch(e => {
@@ -238,7 +244,6 @@
       getMostViewedPosts: function () {
         axios.get(`/api/Notes/count`)
           .then(response => {
-            // JSON responses are automatically parsed.
             this.notesCount = response.data
           })
           .catch(e => {
@@ -248,8 +253,7 @@
       getTags: function () {
         axios.get(`/api/Tags`)
           .then(response => {
-            // JSON responses are automatically parsed.
-            this.tags = response.data.tags
+            this.tags = response.data
           })
           .catch(e => {
             toaster.show('An error occurred getting the posts from the server')
@@ -314,6 +318,10 @@
 
   .active-page{
     text-decoration: underline;
+  }
+
+  .active-tag{
+
   }
 
   footer{

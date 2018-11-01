@@ -120,9 +120,8 @@
           more: this.more.text,
           id: this.id,
           type: 'equipment',
-          tags: this.tags.tagsString.split(',')
+          tags: this.tags.tagsString.split(',').map(item => { return item.trim().trimStart()})
         }
-        this.postTags()
         if(this.id){
           await this.uploadCroppedImage(this.id, 'header', true)
           axios.put(`/api/Notes`, post)
@@ -173,9 +172,6 @@
           0.8 // compression
         );
       },
-      postTags(){
-        axios.post(`/api/Tags/?tags=${this.tagsString}`)
-      }
     },
     mounted(){
       if(this.post){
