@@ -21,6 +21,7 @@
         <!-- Blog entries -->
         <div class="w3-col l8 s12">
 
+          <router-view></router-view>
           <div class="w3-card-4 w3-margin w3-white" v-for="(post, index) in posts">
             <img :src="getImageUrl(post.id)" style="width:100%">
             <div class="w3-container">
@@ -166,7 +167,10 @@
         this.getPosts()
       },
       showModal(post) {
-        if(post) axios.post(`/api/Statistics?noteId=${post.id}`)
+        this.$router.push({path: `/post/${post.id}`})
+        return;
+
+        if (post) axios.post(`/api/Statistics?noteId=${post.id}`)
         let modal = this.loggedIn ? editpostmodal : viewpostmodal
         let ComponentClass = Vue.extend(modal)
         let instance = new ComponentClass({
