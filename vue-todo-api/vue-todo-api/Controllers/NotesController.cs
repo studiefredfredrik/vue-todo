@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
@@ -44,6 +45,19 @@ namespace VueTodoApi.Controllers
                         .Take(pageSize)
                         .ToList();    
                 }
+                
+                return Ok(res);
+            }
+        }
+        
+        [HttpGet("{id}")]
+        public IActionResult Get(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return Forbid();
+            using (var session = _store.OpenSession())
+            {
+
+                var res = session.Load<NotesDocument>(id);
                 
                 return Ok(res);
             }
