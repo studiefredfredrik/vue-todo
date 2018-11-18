@@ -8,7 +8,7 @@
         <span class="w3-tag w3-small w3-margin-bottom w3-margin"
               @click="setActiveTag(tag)"
               v-bind:class="[state.activeTag === tag.tag ? 'w3-black w3-padding' : 'w3-light-grey']"
-              v-for="(tag, index) in state.tags">{{tag.tag}}
+              v-for="(tag) in state.tags">{{tag.tag}}
         </span>
       </p>
     </div>

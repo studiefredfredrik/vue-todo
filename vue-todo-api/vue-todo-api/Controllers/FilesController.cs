@@ -22,7 +22,6 @@ namespace VueTodoApi.Controllers
         }
 
         [DisableRequestSizeLimit]
-        [Authorize]
         [HttpGet("{folder}/{fileName}")]
         public IActionResult GetFile(string folder, string fileName)
         {
