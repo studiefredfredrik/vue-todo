@@ -58,7 +58,7 @@
   import store from '../data/store'
 
   export default {
-    name: 'editpostmodal',
+    name: 'EditPost',
     data: function() {
       return {
         image: {
@@ -91,7 +91,6 @@
         }
       }
     },
-    props: ['post'],
     methods: {
        savePost: async function(){
         let post = {
@@ -155,20 +154,23 @@
         );
       },
     },
-    async created() {
+    async mounted() {
       let post = (await axios.get(`/api/Notes/${this.$route.params.id}`)).data
-      console.log('dat post',post)
-      if (post) {
-        this.heading.text = post.heading
-        this.description.text = post.description
-        this.more.text = post.more
-        this.image.image = post.image
-        if (!post.image) image.editing = true;
-        this.id = post.id
-        this.tags.tags = post.tags || []
-        this.tags.tagsString = tags.tags.join(',')
-      }
-      this.propsLoaded = true;
+      this.$nextTick(() => {
+        if (post) {
+          console.log('tester', this.heading, this.image)
+          this.heading.text = post.heading
+          this.description.text = post.description
+          this.more.text = post.more
+          this.image.image = post.image
+          if (!post.image) this.image.editing = true;
+          this.id = post.id
+          this.tags.tags = post.tags || []
+          this.tags.tagsString = this.tags.tags.join(',')
+        }
+        this.propsLoaded = true;
+      });
+
     },
     components: {
       VueMarkdown
