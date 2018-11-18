@@ -8,12 +8,17 @@
 <script>
   import store from '../data/store'
   export default {
-    name: "Header",
+    name: "BlogHeader",
     data: function () {
       return {
         state: store.state
       }
     },
+    methods: {
+      goToFrontpage: function(){
+        this.$router.push({path: `/`})
+      }
+    }
   }
 </script>
 
