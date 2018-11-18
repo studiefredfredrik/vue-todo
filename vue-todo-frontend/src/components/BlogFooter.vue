@@ -7,6 +7,7 @@
 </template>
 
 <script>
+  import axios from 'axios';
   import store from '../data/store'
   export default {
     name: "BlogFooter",
@@ -19,8 +20,22 @@
       getNumberOfPages(){
         return Math.floor(store.state.notesCount / store.state.pageSize) + 1
       },
+      getPostCount: function () {
+        axios.get(`/api/Notes/count`)
+          .then(response => {
+            store.state.notesCount = response.data
+          })
+          .catch(this.showError)
+      },
+      goToPage(pageNumber){
+        store.state.currentPage = pageNumber-1
+        this.$router.push({ query: { page: store.state.currentPage }})
+        this.getPosts()
+      },
+    },
+    created(){
+      this.getPostCount()
     }
-
   }
 </script>
 

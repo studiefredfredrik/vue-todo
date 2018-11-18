@@ -15,6 +15,7 @@
 </template>
 
 <script>
+  import axios from 'axios';
   import store from '../data/store'
   export default {
     name: "Sidebar",
@@ -36,8 +37,22 @@
           cacheBustHash = `?${Date.now()}`
         }
         return `/api/Files/${noteId}/header.jpg${cacheBustHash}`
+      },
+      getTop4: function () {
+        axios.get(`/api/Statistics/top4`)
+          .then(response => {
+            store.state.top4 = response.data
+          })
+          .catch(this.showError)
+      },
 
+      showError: function () {
+        toaster.show('An error occurred getting the posts from the server')
       }
+    },
+    created(){
+      this.getTop4()
+      store.state.currentPage = this.$route.query.page || 0
     }
   }
 </script>
