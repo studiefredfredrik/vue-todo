@@ -135,7 +135,6 @@
         this.sidebar.image.image = this.frontpage.sidebar.image
         if(!this.sidebar.image.image) this.sidebar.image.editing = true
         this.sidebar.description.text = this.frontpage.sidebar.description
-        console.log(this.sidebar.description.text)
       }
     },
     components: {

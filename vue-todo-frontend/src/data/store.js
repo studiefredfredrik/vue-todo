@@ -13,10 +13,10 @@ export default new Vuex.Store({
     sidebar: {},
     loggedIn: false,
     currentPage: 0,
-    pageSize: 10,
+    pageSize: 5,
     notesCount: 0,
     cacheBustId: null,
     top4: [],
-    shouldReloadPosts: false
+    shouldReloadPosts: true
   }
 })

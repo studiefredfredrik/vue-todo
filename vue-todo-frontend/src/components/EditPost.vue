@@ -41,7 +41,7 @@
   import axios from 'axios';
   import VueMarkdown from 'vue-markdown'
   import toaster from '@/components/ToasterModule'
-  import store from '../data/store'
+  import store from '@/data/store'
 
   export default {
     name: 'EditPost',
@@ -53,19 +53,15 @@
           editing: false,
         },
         heading: {
-          text: `BLOG ENTRY`,
+          text: `Heading goes here`,
           editing: false,
         },
         description: {
-          text: `Mauris neque quam, fermentum ut nisl vitae, convallis maximus nisl.
-                  Sed mattis nunc id lorem euismod placerat.
-                  Vivamus porttitor magna enim, ac accumsan tortor cursus at. Phasellus sed ultricies mi non congue ullam corper.
-                  Praesent tincidunt sed
-                  tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae, ultricies congue gravida diam non fringilla.`,
+          text: `Description goes here, markdown supported`,
           editing: false,
         },
         more: {
-          text: `Even more info here, with more details etc. And more more more`,
+          text: `Main body goes here, markdown supported`,
           editing: false,
         },
         id: '',
@@ -79,9 +75,7 @@
     },
     methods: {
       isNewPost: function(){
-        console.log(this.$route.params.id)
-        if(this.$route.params.id) return false
-        return true
+        return !this.$route.params.id;
       },
        savePost: async function(){
         let post = {
@@ -98,9 +92,7 @@
               store.state.shouldReloadPosts = true
               this.close()
             })
-            .catch(() => {
-              toaster.show('An error occurred saving the post on the server')
-            })
+            .catch(() => {toaster.show('An error occurred saving the post on the server')})
         } else{
           axios.post(`/api/Notes`, post)
             .then(async response => {
@@ -108,9 +100,7 @@
               store.state.shouldReloadPosts = true
               setTimeout(()=>{this.close()}, 100) // TODO: why is this hack neeed?
             })
-            .catch(() => {
-              toaster.show('An error occurred saving the post on the server')
-            })
+            .catch(() => {toaster.show('An error occurred saving the post on the server')})
         }
       },
       deletePost: function(){
@@ -119,9 +109,7 @@
             store.state.shouldReloadPosts = true
             this.close()
           })
-          .catch(() => {
-            toaster.show('An error occurred deleting the post on the server')
-          })
+          .catch(() => {toaster.show('An error occurred deleting the post on the server')})
       },
       close() {
         this.$router.push({path: `/`})

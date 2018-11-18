@@ -16,7 +16,7 @@
 
 <script>
   import axios from 'axios';
-  import store from '../data/store'
+  import store from '@/data/store'
   export default {
     name: "Sidebar",
     data: function () {
@@ -42,11 +42,7 @@
           .then(response => {
             store.state.top4 = response.data
           })
-          .catch(this.showError)
-      },
-
-      showError: function () {
-        toaster.show('An error occurred getting the posts from the server')
+          .catch(() => {toaster.show('An error occurred getting top posts from the server')})
       }
     },
     created(){
@@ -57,5 +53,12 @@
 </script>
 
 <style scoped>
-
+  .views-counter{
+    float: right;
+    font-size: 8px;
+    font-style: italic;
+    padding: 4px;
+    border-radius: 5px;
+    background: #f1f1f1;
+  }
 </style>

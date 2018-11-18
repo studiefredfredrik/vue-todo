@@ -17,7 +17,7 @@
 
 <script>
   import axios from 'axios';
-  import store from '../data/store'
+  import store from '@/data/store'
 
   export default {
     name: "Tags",
@@ -33,14 +33,14 @@
           .then(response => {
             store.state.tags = response.data
           })
-          .catch(this.showError)
+          .catch(() => {toaster.show('An error occurred getting tags from the server')})
       },
       getPosts: function () {
         axios.get(`/api/Notes?pageSize=${store.state.pageSize}&pageNumber=${store.state.currentPage}&tag=${store.state.activeTag}`)
           .then(response => {
             store.state.posts = response.data
           })
-          .catch(this.showError)
+          .catch(() => {toaster.show('An error occurred getting the posts from the server')})
       },
       setActiveTag(tag){
         store.state.currentPage = 0

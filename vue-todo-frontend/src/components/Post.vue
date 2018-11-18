@@ -44,7 +44,6 @@
     },
     async created() {
       this.post = (await axios.get(`/api/Notes/${this.$route.params.id}`)).data
-      console.log(this.post)
     },
     components: {
       VueMarkdown
