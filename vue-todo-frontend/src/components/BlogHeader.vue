@@ -19,7 +19,7 @@
         store.state.activeTag = ''
         store.state.currentPage = 0
         store.state.shouldReloadPosts = true
-        this.$router.push({page: '/', query: { page: store.state.currentPage}})
+        this.$router.push({name: 'Frontpage'})
       }
     }
   }
