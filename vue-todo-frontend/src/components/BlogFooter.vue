@@ -2,7 +2,7 @@
   <footer v-if="getNumberOfPages() > 1">
     <a class="left-button" @click="goToPage(state.currentPage-1)" v-if="state.currentPage > 0"><<</a>
     <a class="page-number" @click="goToPage(index-1)" v-bind:class="{'active-page': state.currentPage === index-1}" v-for="index in getNumberOfPages()">{{index}}</a>
-    <a class="right-button" @click="goToPage(state.currentPage+1)" v-if="state.currentPage < getNumberOfPages()">>></a>
+    <a class="right-button" @click="goToPage(state.currentPage+1)" v-if="state.currentPage < getNumberOfPages() -1">>></a>
   </footer>
 </template>
 
