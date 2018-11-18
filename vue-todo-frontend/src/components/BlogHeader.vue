@@ -16,6 +16,9 @@
     },
     methods: {
       goToFrontpage: function(){
+        if(store.state.activeTag !== '') store.state.shouldReloadPosts = true
+        store.state.activeTag = ''
+        store.state.currentPage = 0
         this.$router.push({path: `/`})
       }
     }

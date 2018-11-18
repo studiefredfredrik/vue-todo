@@ -30,6 +30,7 @@ namespace VueTodoApi.Controllers
                     .OrderByDescending(x => x.Count)
                     .ToList();
 
+                list.RemoveAll(t => string.IsNullOrWhiteSpace(t.Tag));
                 return Ok(list);
             }
         }

@@ -30,7 +30,7 @@
 </template>
 
 <script>
-  import axios from 'axios';
+
   import VueMarkdown from 'vue-markdown'
   import store from './data/store'
   import About from '@/components/About.vue'
@@ -57,19 +57,11 @@
         return `/api/Files/${noteId}/header.jpg${cacheBustHash}`
       },
       showPost(post) {
-        console.log(store.state)
         if (store.state.loggedIn) this.$router.push({path: `/edit/${post.id}`})
         else this.$router.push({path: `/post/${post.id}`})
       },
       createPost() {
         this.$router.push({path: `/new/post`})
-      },
-      getPosts: function () {
-        axios.get(`/api/Notes?pageSize=${store.state.pageSize}&pageNumber=${store.state.currentPage}&tag=${store.state.activeTag}`)
-          .then(response => {
-            store.state.posts = response.data
-          })
-          .catch(this.showError)
       },
       showError: function () {
         toaster.show('An error occurred getting the posts from the server')
@@ -79,9 +71,6 @@
       if(document.cookie.indexOf('user=') > -1){
         store.state.loggedIn = true
       }
-    },
-    created() {
-      this.getPosts()
     },
     components: {
       Sidebar,

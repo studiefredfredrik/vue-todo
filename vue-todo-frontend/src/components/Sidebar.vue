@@ -26,7 +26,6 @@
     },
     methods: {
       showPost(post) {
-        console.log(store.state)
         if (store.state.loggedIn) this.$router.push({path: `/edit/${post.id}`})
         else this.$router.push({path: `/post/${post.id}`})
       },

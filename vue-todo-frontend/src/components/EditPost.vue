@@ -2,47 +2,33 @@
   <div v-if="propsLoaded">
     <!-- Blog entry -->
     <div class="w3-card-4 w3-margin w3-white post-container">
-      <croppa v-if="propsLoaded"
-              v-model="image.myCroppa"
+      <croppa v-model="image.myCroppa"
               :width="700"
               :height="220"
               :initial-image="getImageUrl('header.jpg')"
       ></croppa>
       <div class="w3-container">
-        <input type="text" v-if="heading.editing" v-on:blur="heading.editing = false" v-model="heading.text"/>
-        <h3><b v-if="!heading.editing" v-on:click="heading.editing = true">{{heading.text}}</b></h3>
+        <input type="text" v-model="heading.text" tabindex="1"/>
       </div>
 
       <div class="w3-container" id="text">
-        <textarea type="text" rows="10" class="widt100" v-if="description.editing" v-on:blur="description.editing = false" v-model="description.text" tabindex="1"></textarea>
-        <p id="description" v-if="!description.editing" v-on:click="description.editing = true">
-          <vue-markdown>{{description.text}}</vue-markdown>
-        </p>
-
-        <textarea class="widt100" rows="10" type="text" v-if="more.editing" v-on:blur="more.editing = false" v-model="more.text" tabindex="2"></textarea>
-        <p v-if="!more.editing" v-on:click="more.editing = true">
-          <vue-markdown>{{more.text}}</vue-markdown>
-        </p>
+        <textarea type="text" rows="10" class="widt100" v-model="description.text" tabindex="2"></textarea>
+        <textarea class="widt100" rows="10" type="text" v-model="more.text" tabindex="3"></textarea>
         <br>
       </div>
 
       <!-- tags -->
       <div class="w3-container">
-        <input type="text" v-if="tags.editing" v-on:blur="tagsEditingChanged(false)" v-model="tags.tagsString"/>
-      </div>
-      <div class="w3-container w3-white" v-if="!tags.editing" v-on:click="tagsEditingChanged(true)">
-        <p>
-          <span class="tags-desc">Tagged with:</span>  <span class="w3-tag 3-light-grey w3-small w3-margin" v-for="(tag, index) in tags.tags">{{tag}}</span>
-        </p>
+        <input type="text" v-model="tags.tagsString" tabindex="4"/>
       </div>
 
       <div class="w3-container">
         <div class="w3-row">
           <div class="w3-col m2 s1">
-            <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()" tabindex="3"><b>Save</b></button></p>
+            <p><button class="w3-button w3-padding-large w3-white w3-border" @click="savePost()" tabindex="5"><b>Save</b></button></p>
           </div>
           <div class="w3-col m4 s6">
-            <p><button class="w3-button w3-padding-large w3-white w3-border" @click="deletePost()" tabindex="4"><b>Delete</b></button></p>
+            <p><button class="w3-button w3-padding-large w3-white w3-border" v-if="!isNewPost()" @click="deletePost()" tabindex="6"><b>Delete</b></button></p>
           </div>
         </div>
       </div>
@@ -92,6 +78,11 @@
       }
     },
     methods: {
+      isNewPost: function(){
+        console.log(this.$route.params.id)
+        if(this.$route.params.id) return false
+        return true
+      },
        savePost: async function(){
         let post = {
           heading: this.heading.text,
@@ -115,7 +106,7 @@
             .then(async response => {
               await this.uploadCroppedImage(response.data.id, 'header', false)
               store.state.shouldReloadPosts = true
-              this.close()
+              setTimeout(()=>{this.close()}, 100) // TODO: why is this hack neeed?
             })
             .catch(() => {
               toaster.show('An error occurred saving the post on the server')
@@ -158,7 +149,6 @@
       let post = (await axios.get(`/api/Notes/${this.$route.params.id}`)).data
       this.$nextTick(() => {
         if (post) {
-          console.log('tester', this.heading, this.image)
           this.heading.text = post.heading
           this.description.text = post.description
           this.more.text = post.more

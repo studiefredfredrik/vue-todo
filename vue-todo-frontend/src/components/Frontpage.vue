@@ -25,6 +25,7 @@
 </template>
 
 <script>
+  import axios from 'axios';
   import VueMarkdown from 'vue-markdown'
   import store from '../data/store'
   export default {
@@ -44,14 +45,25 @@
         return `/api/Files/${noteId}/header.jpg${cacheBustHash}`
       },
       showPost(post) {
-        console.log(store.state)
         if (store.state.loggedIn) this.$router.push({path: `/edit/${post.id}`})
         else this.$router.push({path: `/post/${post.id}`})
+      },
+      getPosts: function () {
+        if(!store.state.shouldReloadPosts) return
+        store.state.shouldReloadPosts = false
+        axios.get(`/api/Notes?pageSize=${store.state.pageSize}&pageNumber=${store.state.currentPage}&tag=${store.state.activeTag}`)
+          .then(response => {
+            store.state.posts = response.data
+          })
+          .catch(this.showError)
       },
     },
     components: {
       VueMarkdown
     },
+    mounted(){
+      this.getPosts()
+    }
   }
 </script>
 

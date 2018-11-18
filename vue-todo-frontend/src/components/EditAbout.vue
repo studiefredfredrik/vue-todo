@@ -16,7 +16,6 @@
           <h3><b v-if="!page.undertitle.editing" v-on:click="page.undertitle.editing = true">{{page.undertitle.text}}</b></h3>
         </div>
 
-
         <!-- Blog entry -->
         <div class="w3-card-4 w3-margin w3-white">
           <croppa v-show="sidebar.image.editing"
@@ -107,14 +106,9 @@
           }
         }
         axios.put(`/api/Frontpage`, post)
-          .then(response => {
-            this.$emit('close', true)
-          })
-          .catch(e => {
-            toaster.show('An error occurred saving the post on the server')
-        })
+          .then(() => {this.$emit('close', true)}).catch(this.showError)
       },
-      close(e) {
+      close() {
         this.$emit('close', false)
       },
       uploadCroppedImage() {
@@ -124,15 +118,15 @@
             formData.append('files[0]', blob)
             axios.post(`/api/Files/?folder=frontpage&fileName=description-image.jpg&overwrite=true`, formData, {headers: {'Content-Type': `multipart/form-data boundary=${formData.boundary}`}})
               .then(response => {
-              })
-              .catch(e => {
-                toaster.show('An error occurred saving the post on the server')
-              })
+              }).catch(this.showError)
           },
           'image/jpeg',
           0.8 // compression
         )
       },
+      showError: function () {
+        toaster.show('An error occurred getting the posts from the server')
+      }
     },
     mounted(){
       if(this.frontpage){
