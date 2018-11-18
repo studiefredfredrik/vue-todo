@@ -14,7 +14,7 @@
           </p>
           <div class="w3-row">
             <div class="w3-col m8 s12">
-              <p><button @click="showModal(post)" class="w3-button w3-padding-large w3-white w3-border"><b>READ MORE »</b></button></p>
+              <p><button @click="showPost(post)" class="w3-button w3-padding-large w3-white w3-border"><b>READ MORE »</b></button></p>
             </div>
           </div>
         </div>
@@ -43,8 +43,10 @@
         }
         return `/api/Files/${noteId}/header.jpg${cacheBustHash}`
       },
-      showModal(post) {
-        this.$router.push({path: `/post/${post.id}`})
+      showPost(post) {
+        console.log(store.state)
+        if (store.state.loggedIn) this.$router.push({path: `/edit/${post.id}`})
+        else this.$router.push({path: `/post/${post.id}`})
       },
     },
     components: {

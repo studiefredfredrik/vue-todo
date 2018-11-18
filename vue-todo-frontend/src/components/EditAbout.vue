@@ -53,7 +53,7 @@
   import toaster from '@/components/ToasterModule'
 
   export default {
-    name: 'editfrontpagemodal',
+    name: 'EditAbout',
     data: function() {
       return {
         page:{

@@ -16,6 +16,7 @@ export default new Vuex.Store({
     pageSize: 10,
     notesCount: 0,
     cacheBustId: null,
-    top4: []
+    top4: [],
+    shouldReloadPosts: false
   }
 })
