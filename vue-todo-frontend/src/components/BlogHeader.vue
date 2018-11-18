@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import store from '../data/store'
+  import store from '@/data/store'
   export default {
     name: "BlogHeader",
     data: function () {
@@ -16,10 +16,10 @@
     },
     methods: {
       goToFrontpage: function(){
-        if(store.state.activeTag !== '') store.state.shouldReloadPosts = true
         store.state.activeTag = ''
         store.state.currentPage = 0
-        this.$router.push({path: `/`})
+        store.state.shouldReloadPosts = true
+        this.$router.push({page: '/', query: { page: store.state.currentPage}})
       }
     }
   }

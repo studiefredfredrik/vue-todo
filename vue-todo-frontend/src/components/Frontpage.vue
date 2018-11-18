@@ -27,7 +27,8 @@
 <script>
   import axios from 'axios';
   import VueMarkdown from 'vue-markdown'
-  import store from '../data/store'
+  import store from '@/data/store'
+  import toaster from '@/components/ToasterModule'
   export default {
     name: 'Frontpage',
     data: function () {
@@ -35,7 +36,7 @@
         state: store.state
       }
     },
-    methods: {
+     methods: {
       getImageUrl(noteId){
         let cacheBustHash = ''
         if (store.state.cacheBustId === noteId) {
@@ -55,13 +56,16 @@
           .then(response => {
             store.state.posts = response.data
           })
-          .catch(this.showError)
-      },
+          .catch(() => {toaster.show('An error occurred getting posts from the server')})
+      }
     },
     components: {
       VueMarkdown
     },
     mounted(){
+      this.getPosts()
+    },
+    beforeRouteUpdate(){
       this.getPosts()
     }
   }

@@ -12,8 +12,8 @@
 <script>
   import Vue from 'vue'
   import axios from 'axios';
-  import store from '../data/store'
   import VueMarkdown from 'vue-markdown'
+  import store from '@/data/store'
   import EditAbout from '@/components/EditAbout.vue'
 
   export default {
@@ -49,9 +49,7 @@
             store.state.frontpage = response.data
             store.state.sidebar = response.data.sidebar
           })
-          .catch(() => {
-            toaster.show('An error occurred getting the posts from the server')
-          })
+          .catch(() => {toaster.show('An error occurred getting the posts from the server')})
       },
     },
     components: {
